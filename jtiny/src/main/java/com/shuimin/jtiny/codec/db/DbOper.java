@@ -1,4 +1,4 @@
-package com.shuimin.jtiny.core.db;
+package com.shuimin.jtiny.codec.db;
 
 import com.shuimin.base.S;
 import com.shuimin.base.util.logger.Logger;

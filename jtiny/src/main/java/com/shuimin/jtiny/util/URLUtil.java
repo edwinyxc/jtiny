@@ -1,4 +1,4 @@
-package com.shuimin.jtiny.core.util;
+package com.shuimin.jtiny.util;
 
 import com.shuimin.base.S;
 

@@ -17,6 +17,7 @@ public interface Router {
     Middleware route(ExecutionContext ctx);
 
     Router add(HttpMethod method,String pattern, Middleware... mw);
+    //TODO 添加多http方法支持
 
     public static class RegexRouter implements Router {
 

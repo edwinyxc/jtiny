@@ -12,20 +12,20 @@ import java.util.*;
 /**
  * @author ed
  */
-public class Executor implements Y {
+public class Executor implements MiddlewareContext {
 
     private final Map<String, Object> attrs = new HashMap<>();//component holder
     private Middleware head;
     private List<Middleware> mwList = new LinkedList<>();
 
     @Override
-    public Y attr(String name, Object o) {
+    public MiddlewareContext attr(String name, Object o) {
         attrs.put(name, o);
         return this;
     }
 
     @Override
-    public Y use(Middleware ware) {
+    public MiddlewareContext use(Middleware ware) {
         mwList.add(ware);
         return this;
     }

@@ -40,10 +40,10 @@ public class HttpServerHandler
         try {
             handler.handle(new NettyRequest(f_req, ctx.channel()),
                 new NettyResponse(f_resp));
-//            Y.debug("after dispatch");
-//            Y.debug(f_resp.getStatus());
-//            Y.debug(f_resp.headers());
-//            Y.debug(f_resp.content());
+//            MiddlewareContext.debug("after dispatch");
+//            MiddlewareContext.debug(f_resp.getStatus());
+//            MiddlewareContext.debug(f_resp.headers());
+//            MiddlewareContext.debug(f_resp.content());
 
             if (isKeepAlive(f_req)) {
                 //length

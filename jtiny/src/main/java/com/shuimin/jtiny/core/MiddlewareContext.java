@@ -4,9 +4,9 @@ package com.shuimin.jtiny.core;
 /**
  * @author ed
  */
-public interface Y extends RequestHandler {
+public interface MiddlewareContext extends RequestHandler {
 
-    default public Y config(Config c) {
+    default public MiddlewareContext config(Config c) {
         c.config(this);
         return this;
     }
@@ -22,9 +22,9 @@ public interface Y extends RequestHandler {
 //    public void handle(HttpServletRequest request, HttpServletResponse resp);
 //    public App route(String regex, Middleware m);
 //    public App use(Middleware m);
-    public Y attr(String name, Object o);
+    public MiddlewareContext attr(String name, Object o);
 
-    public Y use(Middleware ware);
+    public MiddlewareContext use(Middleware ware);
 
     public Object attr(String name);
 

@@ -11,7 +11,7 @@ import com.shuimin.jtiny.core.mw.router.Router;
 import static com.shuimin.jtiny.core.Interrupt.render;
 import static com.shuimin.jtiny.core.Server.BasicServer.jetty;
 
-public class AppTest {
+public class CoreTest {
 
     public static void simple() {
         Server.basis(jetty).use((req, resp) -> {
@@ -40,10 +40,12 @@ public class AppTest {
 
 
         dispatcher.make(ctx -> {
-            ctx.get("/${id}/${user}", Action.end(executionContext -> render(View.Text.one().text(
-                "<p>id=" + executionContext.req().param("id") + "</p>" +
-                    "<p>user=" + executionContext.req().param("user") + "</p>"
-            ))));
+            ctx.get("/${id}/${user}", Action.simple((req, resp) ->
+                    render(View.Text.one().text(
+                        "<p>id=" + req.param("id") + "</p>" +
+                            "<p>user=" + req.param("user") + "</p>"
+                    ))
+            ));
         });
 
 
