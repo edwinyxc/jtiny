@@ -1,89 +1,81 @@
 package com.shuimin.jtiny.core.dispatcher;
 
-import static com.shuimin.base.S._notNull;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import com.shuimin.base.S;
-import com.shuimin.base.S.function.Function;
+import com.shuimin.base.f.Function;
 import com.shuimin.jtiny.Y;
 import com.shuimin.jtiny.core.Action;
 import com.shuimin.jtiny.core.HttpException;
-import com.shuimin.jtiny.core.Request;
+import com.shuimin.jtiny.core.LocaleResolver;
+import com.shuimin.jtiny.core.Router;
 import com.shuimin.jtiny.core.YConfig;
+import java.util.Locale;
+import javax.servlet.http.Cookie;
 
 public class YDispatcher extends AbstractDispatcher {
-	private Function<Request, HttpServletRequest> _resolver;
 
-	public YDispatcher() {
-		_resolver = Y.ctx().config().reqResolver();
-	}
+    LocaleResolver _localeResolver;
+    Router _router;
 
-	final public YDispatcher reqResolver(Function<Request, HttpServletRequest> res) {
-		_resolver = res;
-		return this;
-	}
+    {
+        _router = (path) -> {
+            Y.debug(path);
+            Action a = Y.resources().get(path);
+            if (a == null) {
+                throw new HttpException(404, "[" + path + " ]not found");
+            }
+            Y.debug("find action " + a.toString());
+            return a;
+        };
+    }
 
-	protected void doDispatch(final HttpServletRequest request, final HttpServletResponse response) {
-		// decode
-		String decodedUri = null;
-		try {
-			decodedUri = URLDecoder.decode(request.getRequestURI(), "UTF-8");
-			if (Y.debug()) {
-				Y.logger().debug("dispatch:" + decodedUri);
-			}
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
+    {
+        _localeResolver = (req) -> {
+            Locale ret = new Locale("en", "US");//default
+            //first query cookie;
+            Cookie c = req.cookie(YConfig.COOKIE_LOCALE);
+            if (c != null) {
+                String lc_str = c.getValue();
+                String[] lc_str_parsed = lc_str.split("_");
+                if (lc_str_parsed == null || lc_str_parsed.length < 2) {
+                    Y.logger().info(
+                        "bad format for cookie["
+                        + YConfig.COOKIE_LOCALE + "] ");
+                }
+                return new Locale(lc_str_parsed[0], lc_str_parsed[1]);
+            }
+            //else in  header;
+//			String head_lc = req.header("accept-language");
+//			String[] head_lc_parsed = head_lc.split(",");
+//			if (head_lc_parsed.length > 1) {
+//				String[] real_lc = head_lc_parsed[0].split(",");
+//				return new Locale(real_lc[0], real_lc[1]);
+//			}
+            return req.locale();
+        };
+    }
 
-		Request req = (Request) (request.getAttribute(YConfig.RESOLVED_REQ) == null ?
-		// if not found new Request & put it into the raw HttpServletRequest
-		new Function<Request, HttpServletRequest>() {
-			public Request f(HttpServletRequest a) {
-				Request rr = _notNull(_resolver).f(a);
-				request.setAttribute(YConfig.RESOLVED_REQ, rr);
-				return rr;
-			}
-		}.f(request)
-				// or if this request comes from another, use it
-				: request.getAttribute(YConfig.RESOLVED_REQ));
-		/*
-		 * String uid = _ctx.config().howToGetUID().f(req);
-		 * 
-		 * 
-		 * if (req.cookie(YConfig.USER.USER_LABEL) == null) { Cookie cookie =
-		 * new Cookie(YConfig.USER.USER_LABEL, uid); cookie.setPath("");
-		 * response.addCookie(cookie); }
-		 */
-		Y.req(req);
-		Y.resp(response);
-		try {
-			_route(decodedUri).handle(req, response);
-		} catch (Exception e) {
-			S._lazyThrow(e);
-		}
+    @Override
+    public void localeResolver(LocaleResolver lr) {
+        _localeResolver = lr;
+    }
 
-	}
+    @Override
+    protected Router router() {
+        return _router;
+    }
 
-	private Action _route(String path) {
-		if (Y.debug()) {
-			Y.logger().debug(path);
-		}
-
-		Action a = Y.resources().get(path);
-
-		if (a == null) {
-			throw new HttpException(404, "[" + path + " ]not found");
-		}
-
-		if (Y.debug()) {
-			Y.logger().debug("find action " + a.toString());
-		}
-
-		return a;
-	}
+    @Override
+    protected Function<String, String> pathDecoder() {
+        return (path) -> {
+            try {
+                return URLDecoder.decode(path, "UTF-8");
+            } catch (UnsupportedEncodingException ex) {
+                S._lazyThrow(ex);
+            }
+            return null;
+        };
+    }
 }

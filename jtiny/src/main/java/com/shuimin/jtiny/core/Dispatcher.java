@@ -1,8 +1,17 @@
 package com.shuimin.jtiny.core;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import com.shuimin.jtiny.core.http.Request;
+import com.shuimin.jtiny.core.http.Response;
 
 public interface Dispatcher {
-	public void dispatch(HttpServletRequest req, HttpServletResponse resp);
+
+	/**
+	 *
+	 * @param req
+	 * @param resp
+	 */
+	public void dispatch(Request req, Response resp);
+	
+	public void localeResolver(LocaleResolver lr);
+	
 }

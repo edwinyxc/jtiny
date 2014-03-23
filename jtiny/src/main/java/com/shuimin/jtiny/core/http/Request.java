@@ -1,5 +1,7 @@
 package com.shuimin.jtiny.core.http;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Locale;
 import java.util.Map;
 
@@ -7,13 +9,13 @@ import javax.servlet.http.Cookie;
 
 /**
  * event
- * 
+ *
  * @author ed
- * 
+ *
  */
-public interface HttpRequest {
-	
-	String body();
+public interface Request {
+
+	InputStream in() throws IOException;
 
 	String path();
 
@@ -21,9 +23,9 @@ public interface HttpRequest {
 
 	Locale locale();
 
-	Map<String, String> headers();
+	Map<String, String[]> headers();
 
-	String header(String string);
+	String[] header(String string);
 
 	Map<String, String[]> params();
 
@@ -43,7 +45,7 @@ public interface HttpRequest {
 
 	boolean isDelete();
 
-	String[] remoteIp();
+	String remoteIp();
 
 	Iterable<Cookie> cookies();
 

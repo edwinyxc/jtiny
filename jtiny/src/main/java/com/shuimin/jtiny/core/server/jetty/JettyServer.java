@@ -1,4 +1,4 @@
-package com.shuimin.jtiny.core.server;
+package com.shuimin.jtiny.core.server.jetty;
 
 import java.io.IOException;
 
@@ -33,13 +33,17 @@ public class JettyServer extends YServer {
 
 	@Override
 	public YServer start() {
-		server = new Server(_port);
+		server = new Server(port);
 		server.setHandler(new AbstractHandler() {
 			@Override
-			public void handle(String target, Request baseRequest, HttpServletRequest request,
-					HttpServletResponse response) throws IOException, ServletException {
-				S.echo("ss");
-				Y.ctx().dispatcher().dispatch(request, response);
+			public void handle(String target, Request baseRequest,
+					HttpServletRequest request,
+					HttpServletResponse response)
+					throws IOException, ServletException {
+
+				dispatcher().dispatch(
+						new HSRequestWrapper(request),
+						new HSResponseWrapper(response));
 			}
 		});
 		try {

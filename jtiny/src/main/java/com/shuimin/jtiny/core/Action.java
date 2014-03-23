@@ -3,124 +3,69 @@ package com.shuimin.jtiny.core;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletResponse;
+import com.shuimin.jtiny.core.aop.Interceptor;
+import com.shuimin.jtiny.core.aop.Interrupt;
+import com.shuimin.jtiny.core.http.Request;
+import com.shuimin.jtiny.core.http.Response;
+import java.util.Arrays;
 
-import com.shuimin.base.S;
-import com.shuimin.base.S.function.Callback;
+public abstract class Action {
 
-public abstract class Action implements RequestHandler {
+    protected String _name;
 
-	protected String _name;
+    protected int _method = HttpMethod.GET;
 
-	protected Controller _controller;
+    public Action on(int method) {
+        _method = method;
+        return this;
+    }
 
-	protected int _method = 0;
+    public boolean allow(String method) {
+        return HttpMethod.allow(_method, HttpMethod.fromString(method));
+    }
 
-	public Action method(int method) {
-		_method = method;
-		return this;
-	}
+    protected Action() {
+        _name = "unknown_action";
+    }
 
-	public Action allow(String method) {
-		if (HttpMethod.allow(_method, HttpMethod.fromString(method))) {
-			return this;
-		} else
-			throw new HttpException(406, "use only [get, post, delete, put]");
-	}
+    protected Action(String name) {
+        _name = name;
+    }
 
-	protected Action() {
-		_name = "unknown_action";
-	}
+    public String name() {
+        return _name;
+    }
 
-	protected Action(String name) {
-		_name = name;
-	}
+    public Action name(String name) {
+        _name = name;
+        return this;
+    }
 
-	public String name() {
-		return _name;
-	}
+    final private List<Interceptor> _interceptors = new LinkedList<>();
 
-	public Action name(String _) {
-		_name = _;
-		return this;
-	}
+    public List<Interceptor> interceptors() {
+        return _interceptors;
+    }
 
-	protected Action _withController(Controller controller) {
-		_controller = controller;
-		return this;
-	}
+    final public Action onProcess(Interceptor... cb) {
+        _interceptors.addAll(Arrays.asList(cb));
+        return this;
+    }
 
-	final private List<Callback<Request>> _onProcess = new LinkedList<Callback<Request>>();
+    public final void handle(Request req, Response resp) {
+        try {
+            exec(req, resp);
+        } catch (Interrupt.RedirectInterruption d) {
+            resp.redirect(d.uri());
+        } catch (Interrupt.RenderViewInterruption d) {
+            d.view().render(resp);
+        }
+    }
 
-	final public Action onProcess(Callback<Request>... cb) {
+    protected abstract void exec(Request req, Response resp);
 
-		for (Callback<Request> c : cb) {
-			_onProcess.add(c);
-		}
-
-		return this;
-	}
-
-	final protected void redirect(String uri) throws RedirectInterception {
-		throw new RedirectInterception(uri);
-	}
-
-	final protected void forward(String uri) throws ForwardInterception {
-		throw new ForwardInterception(uri);
-	}
-
-	final protected void show(View view) throws ViewInterception {
-		throw new ViewInterception(view);
-	}
-
-	@Override
-	public final void handle(final Request req, HttpServletResponse resp) throws Exception {
-		for (Callback<Request> cb : _onProcess) {
-			cb.f(req);
-		}
-		try {
-			exec(req, resp);
-		} catch (ForwardInterception f) {
-			req.raw().getRequestDispatcher(f._uri).forward(req.raw(), resp);
-			return;
-		} catch (RedirectInterception d) {
-			resp.sendRedirect(d._uri);
-			return;
-		} catch (ViewInterception v) {
-			v._view.render(resp);
-		}
-	}
-
-	protected abstract void exec(Request req, HttpServletResponse resp) throws Exception;
-
-	@SuppressWarnings("serial")
-	class RedirectInterception extends Exception {
-		final private String _uri;
-
-		public RedirectInterception(String uri) {
-			_uri = S._notNull(uri);
-		}
-	}
-
-	@SuppressWarnings("serial")
-	class ViewInterception extends Exception {
-		final private View _view;
-
-		public ViewInterception(View view) {
-			_view = S._notNull(view);
-		}
-	}
-
-	@SuppressWarnings("serial")
-	class ForwardInterception extends Exception {
-		final private String _uri;
-
-		public ForwardInterception(String uri) {
-			_uri = S._notNull(uri);
-		}
-	}
-
-	public String toString() {
-		return S._avoidNull(_controller, Controller.class).name() + "#" + _name;
-	}
+    @Override
+    public String toString() {
+        return "Action[" + _name + "]";
+    }
 }

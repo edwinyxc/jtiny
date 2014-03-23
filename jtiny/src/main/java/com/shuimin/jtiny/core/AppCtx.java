@@ -2,12 +2,14 @@ package com.shuimin.jtiny.core;
 
 import com.shuimin.base.S;
 import com.shuimin.base.util.logger.Logger;
+import com.shuimin.jtiny.db.ConnectionPool;
+import java.util.Properties;
 
 /**
  * Application context
- * 
+ *
  * @author ed
- * 
+ *
  */
 public final class AppCtx {
 
@@ -15,6 +17,7 @@ public final class AppCtx {
 	}
 
 	public final static class holder {
+
 		final private static AppCtx instance = new AppCtx();
 	}
 
@@ -22,9 +25,10 @@ public final class AppCtx {
 		return holder.instance;
 	}
 
+	private ConnectionPool _cp;
 	private Logger _logger = S.logger();
 	private YConfig _config;
-	private YDispatcher _dispatcher;
+	private Dispatcher _dispatcher;
 	private YActions _resources;
 	private YServer _server;
 
@@ -32,8 +36,8 @@ public final class AppCtx {
 		return _logger;
 	}
 
-	public AppCtx logger(Logger _) {
-		_logger = _;
+	public AppCtx logger(Logger logger) {
+		_logger = logger;
 		return this;
 	}
 
@@ -41,17 +45,17 @@ public final class AppCtx {
 		return _config;
 	}
 
-	public AppCtx config(YConfig _) {
-		_config = _;
+	public AppCtx config(YConfig config) {
+		_config = config;
 		return this;
 	}
 
-	public YDispatcher dispatcher() {
+	public Dispatcher dispatcher() {
 		return _dispatcher;
 	}
 
-	public AppCtx dispatcher(YDispatcher _) {
-		_dispatcher = _;
+	public AppCtx dispatcher(Dispatcher dispatcher) {
+		_dispatcher = dispatcher;
 		return this;
 	}
 
@@ -59,13 +63,13 @@ public final class AppCtx {
 		return _resources;
 	}
 
-	public AppCtx resources(YActions _) {
-		_resources = _;
+	public AppCtx resources(YActions resources) {
+		_resources = resources;
 		return this;
 	}
 
-	public AppCtx server(YServer _) {
-		_server = _;
+	public AppCtx server(YServer server) {
+		_server = server;
 		return this;
 	}
 
@@ -79,6 +83,15 @@ public final class AppCtx {
 
 	public void stop() {
 		_server.stop();
+	}
+
+	public AppCtx connectionPool(ConnectionPool cp) {
+		_cp = cp;
+		return this;
+	}
+
+	public ConnectionPool connectionPool() {
+		return _cp;
 	}
 
 }

@@ -1,12 +1,12 @@
 package com.shuimin.jtiny.core.view;
 
-
 import com.alibaba.fastjson.JSON;
 import com.shuimin.base.S;
-import com.shuimin.jtiny.core.ResultMap;
+import java.util.Map;
 
 public class JsonView extends TextView {
-	protected JsonView(ResultMap map) {
+
+	protected JsonView(Map map) {
 		super(JSON.toJSONString(S._notNull(map)));
 	}
 
@@ -14,11 +14,11 @@ public class JsonView extends TextView {
 		super("");
 	}
 
-	public static JsonView one(ResultMap map) {
+	public static JsonView one(Map map) {
 		return new JsonView(map);
 	}
 
-	public JsonView of(ResultMap map) {
+	public JsonView of(Map map) {
 		return new JsonView(map);
 	}
 }

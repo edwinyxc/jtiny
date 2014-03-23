@@ -1,52 +1,71 @@
 package com.shuimin.jtiny.core.server.netty;
 
-import org.jboss.netty.buffer.DynamicChannelBuffer;
-import org.jboss.netty.channel.*;
-import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jboss.netty.handler.codec.http.HttpRequest;
-import org.jboss.netty.handler.codec.http.HttpResponse;
-import us.codecraft.express.router.UrlRouter;
+import com.shuimin.jtiny.Y;
+import com.shuimin.jtiny.core.Dispatcher;
+import com.shuimin.jtiny.core.aop.Interrupt;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.FullHttpResponse;
+import static io.netty.handler.codec.http.HttpHeaders.*;
+import static io.netty.handler.codec.http.HttpHeaders.Names.*;
+import static io.netty.handler.codec.http.HttpHeaders.Values.*;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+import io.netty.handler.codec.http.HttpVersion;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+public class HttpServerHandler
+    extends SimpleChannelInboundHandler<FullHttpRequest> {
 
-import static org.jboss.netty.handler.codec.http.HttpResponseStatus.OK;
-import static org.jboss.netty.handler.codec.http.HttpVersion.HTTP_1_1;
+    final Dispatcher dispather; // THE DISPATCHER
 
-/**
- * @author yihua.huang@dianping.com
- */
-public class HttpServerHandler extends SimpleChannelUpstreamHandler {
+    public HttpServerHandler(Dispatcher dispatcher) {
+        this.dispather = dispatcher;
+    }
 
-	@Override
-	public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
-		super.channelClosed(ctx, e);
-	}
+    @Override
+    protected void messageReceived(ChannelHandlerContext ctx,
+                                   FullHttpRequest msg)
+        throws Exception {
+        FullHttpRequest f_req = msg;
+        FullHttpResponse f_resp
+            = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
+                                          Unpooled.buffer());
 
-	@Override
-	public void messageReceived(ChannelHandlerContext ctx, MessageEvent event) throws Exception {
-		if (event.getMessage() instanceof HttpRequest) {
-			try {
-				HttpServletRequest httpServletRequest = new NettyHttpServletRequest(
-						(HttpRequest) event.getMessage(), ctx.getChannel());
-				HttpResponse response = new DefaultHttpResponse(HTTP_1_1, OK);
-				response.setContent(new DynamicChannelBuffer(200));
-				HttpServletResponse httpServletResponse = new NettyHttpServletResponseAdaptor(response,
-						ctx.getChannel());
-				urlRouter.route(httpServletRequest).execute(httpServletRequest, httpServletResponse);
-				response.headers().set(HttpHeaders.Names.CONTENT_LENGTH, response.getContent().writerIndex());
-				ctx.getChannel().write(response);
-				ctx.getChannel().close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-	}
+        try {
+            dispather.dispatch(new NettyRequest(f_req, ctx.channel()),
+                               new NettyResponse(f_resp));
+            Y.debug("after dispatch");
+            Y.debug(f_resp.getStatus());
+            Y.debug(f_resp.headers());
+            Y.debug(f_resp.content());
 
-	@Override
-	public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
-		// DO NOTHING ha ha!
-		// super.exceptionCaught(ctx, e);
-	}
+            if (isKeepAlive(f_req)) {
+                //length
+                f_resp.headers().set(
+                    CONTENT_LENGTH, f_resp.content().readableBytes());
+                f_resp.headers().set(CONNECTION, KEEP_ALIVE);
+            }
+            ChannelFuture last = ctx.write(f_resp);
+            // Write the end marker
+            if (!isKeepAlive(f_req)) {
+                // Close the connection when the whole content is written out.
+                last.addListener(ChannelFutureListener.CLOSE);
+            }
+
+        } catch (Interrupt.JumpInterruption jump) {
+            //catch jump 
+            Y.debug(jump);
+            Y.debug(f_resp.getStatus());
+            Y.debug(f_resp.headers());
+            ctx.writeAndFlush(f_resp).addListener(ChannelFutureListener.CLOSE);
+        } finally {
+            // Write the end marker
+            ctx.flush();
+        }
+    }
+
 }
