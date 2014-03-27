@@ -29,7 +29,7 @@ public final class AppCtx {
 	private Logger _logger = S.logger();
 	private YConfig _config;
 	private Dispatcher _dispatcher;
-	private YActions _resources;
+	private YResources _resources;
 	private YServer _server;
 
 	public Logger logger() {
@@ -59,11 +59,11 @@ public final class AppCtx {
 		return this;
 	}
 
-	public YActions resources() {
+	public YResources resources() {
 		return _resources;
 	}
 
-	public AppCtx resources(YActions resources) {
+	public AppCtx resources(YResources resources) {
 		_resources = resources;
 		return this;
 	}

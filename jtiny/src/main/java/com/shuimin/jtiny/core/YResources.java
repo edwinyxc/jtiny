@@ -1,20 +1,19 @@
 package com.shuimin.jtiny.core;
 
-
 import com.shuimin.base.S;
 import com.shuimin.base.f.Function;
 import com.shuimin.base.f.Tuple;
 import com.shuimin.base.struc.Cache;
 import com.shuimin.jtiny.Y;
 
-public class YActions {
+public class YResources {
 
-    private final ActionTree yrt = new ActionTree().name(Y.config().name());
+    private final ResourceTree yrt = new ResourceTree().name(Y.config().name());
 
-    private final Cache<String, ActionTree> cache
-        = Cache.<String, ActionTree>lruCache(1000).onNotFound(
+    private final Cache<String, ResourceTree> cache
+        = Cache.<String, ResourceTree>lruCache(1000).onNotFound(
             (path) -> {
-                ActionTree result = _getTree(path);
+                ResourceTree result = _getTree(path);
                 if (result == null) {
                     throw new HttpException(
                         404, "[" + path + "] not found.");
@@ -26,7 +25,7 @@ public class YActions {
         return Y.get();
     }
 
-    public ActionTree rt() {
+    public ResourceTree rt() {
         return yrt;
     }
 
@@ -48,19 +47,19 @@ public class YActions {
         }.apply()).<String>map((a) -> a.trim()).join();
     }
 
-    private Tuple<ActionTree, String> _find_and_mkdirs(String path) {
+    private Tuple<ResourceTree, String> _find_and_mkdirs(String path) {
         String[] paths = splitPath(path);
         S.echo("paths:" + S.dump(paths));
-        ActionTree cur = yrt;
+        ResourceTree cur = yrt;
         for (int i = 0; i < paths.length; i++) {
             S.echo("name=" + paths[i]);
-            ActionTree next = cur.select(paths[i]);
+            ResourceTree next = cur.select(paths[i]);
             S.echo("next=" + next);
             if (next == null) {
                 if (i == paths.length - 1) {
                     next = cur;
                 } else {
-                    next = new ActionTree().name(paths[i]);
+                    next = new ResourceTree().name(paths[i]);
                     next.addTo(cur);
                 }
             }
@@ -70,14 +69,18 @@ public class YActions {
         return Tuple._2(cur, paths[paths.length - 1]);
     }
 
-    public YActions bind(String path, Action action) {
-        Tuple<ActionTree, String> result = _find_and_mkdirs(path);
+    public YResources bind(String path, Resource res) {
+        Tuple<ResourceTree, String> result = _find_and_mkdirs(path);
         if (result._b.equals("/")) {
-            result._a.elem(action.name(result._b));
+            result._a.elem(res.name(result._b));
         } else {
-            result._a.add(new ActionTree(action.name(result._b)));
+            result._a.add(new ResourceTree(res.name(result._b)));
         }
         return this;
+    }
+
+    public YResource bind() {
+
     }
 
 //	public YActions bind(String path, Controller controller) {
@@ -88,13 +91,13 @@ public class YActions {
 //		});
 //		return this;
 //	}
-    private ActionTree _getTree(String path) {
-        ActionTree node = yrt.select(splitPath(path));
+    private ResourceTree _getTree(String path) {
+        ResourceTree node = yrt.select(splitPath(path));
         Y.tree_node(node);
         return node;
     }
 
-    public Action get(String path) {
+    public Resource get(String path) {
         return cache.get(path).elem();
     }
 

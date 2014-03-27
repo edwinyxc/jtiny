@@ -10,36 +10,46 @@ import com.shuimin.jtiny.core.http.Response;
 import java.util.Arrays;
 
 public abstract class Action {
-
-    protected String _name;
-
-    protected int _method = HttpMethod.GET;
-
-    public Action on(int method) {
-        _method = method;
+    
+    protected String _path = "";
+    protected String _name = "unkonwn";
+    
+    public String name(){
+        return _name;
+    }
+    
+    public Action name(String name){
+        _name = name;
+        return this;
+    }
+    
+    public String path(){
+        return _path;
+    }
+    
+    public Action path(String path){
+        _name = path;
         return this;
     }
 
-    public boolean allow(String method) {
-        return HttpMethod.allow(_method, HttpMethod.fromString(method));
+    protected int _method = HttpMethod.GET;
+
+    public int method() {
+        return _method;
     }
 
     protected Action() {
-        _name = "unknown_action";
     }
 
     protected Action(String name) {
         _name = name;
     }
 
-    public String name() {
-        return _name;
+    protected Action(String name, int method) {
+        _name = name;
+        _method = method;
     }
 
-    public Action name(String name) {
-        _name = name;
-        return this;
-    }
 
     final private List<Interceptor> _interceptors = new LinkedList<>();
 
@@ -62,7 +72,14 @@ public abstract class Action {
         }
     }
 
-    protected abstract void exec(Request req, Response resp);
+    /**
+     * offer a basic logic, override is allowed
+     *
+     * @param req
+     * @param resp
+     */
+    protected void exec(Request req, Response resp) {
+    }
 
     @Override
     public String toString() {

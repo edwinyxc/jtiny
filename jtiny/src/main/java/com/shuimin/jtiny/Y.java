@@ -3,9 +3,9 @@ package com.shuimin.jtiny;
 import javax.servlet.http.HttpServletResponse;
 
 import com.shuimin.base.util.logger.Logger;
-import com.shuimin.jtiny.core.ActionTree;
+import com.shuimin.jtiny.core.ResourceTree;
 import com.shuimin.jtiny.core.AppCtx;
-import com.shuimin.jtiny.core.YActions;
+import com.shuimin.jtiny.core.YResources;
 import com.shuimin.jtiny.core.YConfig;
 import com.shuimin.jtiny.core.YServer;
 import com.shuimin.jtiny.core.dispatcher.YDispatcher;
@@ -21,7 +21,7 @@ public class Y {
 
 	private Request req;
 	private HttpServletResponse resp;
-	private ActionTree tree_node;
+	private ResourceTree tree_node;
 
 	public static final AppCtx ctx = AppCtx.instance();
 
@@ -30,7 +30,7 @@ public class Y {
 		ctx.config(new YConfig());
 		ctx.dispatcher(new YDispatcher());
 		ctx.server(YServer.netty());
-		ctx.resources(new YActions());
+		ctx.resources(new YResources());
 		//ctx.connectionPool(new ConnectionPool());
 	}
 
@@ -76,7 +76,7 @@ public class Y {
 		return Y.ctx;
 	}
 
-	public static YActions resources() {
+	public static YResources resources() {
 		return ctx().resources();
 	}
 
@@ -114,11 +114,11 @@ public class Y {
 		get().resp = resp;
 	}
 
-	public static ActionTree tree_node() {
+	public static ResourceTree tree_node() {
 		return get().tree_node;
 	}
 
-	public static void tree_node(ActionTree tree_node) {
+	public static void tree_node(ResourceTree tree_node) {
 		get().tree_node = tree_node;
 	}
         

@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.shuimin.jtiny.core.HttpMethod.*;
+
 /**
  *
  * @author ed
@@ -60,7 +62,7 @@ public class ActionExecution
                 }
             }
             Y.debug("#entering handle");
-            if (action.allow(req.method())) {
+            if (allow(action.method(), HttpMethod.of(req.method()))) {
                 action.handle(req, resp);
             } else {
                 throw new HttpException(406, "wrong method");
