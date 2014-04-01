@@ -1,55 +1,39 @@
 package com.shuimin.jtiny;
 
-import com.shuimin.jtiny.core.Action;
-import com.shuimin.jtiny.core.HttpMethod;
+import com.shuimin.base.S;
+
+import static com.shuimin.jtiny.Server.BasicServer.jetty;
+
+import com.shuimin.jtiny.core.Executor;
 import com.shuimin.jtiny.core.View;
-import com.shuimin.jtiny.core.aop.Interrupt;
-import com.shuimin.jtiny.core.http.Request;
-import com.shuimin.jtiny.core.http.Response;
+import com.shuimin.jtiny.http.Request;
+import com.shuimin.jtiny.http.Response;
+import com.shuimin.jtiny.mw.Action;
+import com.shuimin.jtiny.mw.Dispatcher;
+import com.shuimin.jtiny.mw.Router;
 
 public class AppTest {
+    public static void simple() {
+        Server.basis(jetty).use((req, resp) -> {
+            S.echo(req);
+            resp.writer().print("sddd");
+        }).listen(9090);
+    }
 
-    public void test() {
+    public static void _1() {
 
+
+        final Dispatcher app = new Dispatcher(new Router.RegexRouter());
+        app.make(ctx -> {
+            ctx.route("/", Action.simple((req, resp) -> {
+                resp.redirect("http://baidu.com");
+            }));
+        });
+        Server.basis(jetty).use(app).listen(9090);
     }
 
     public static void main(String[] args) {
-        Y.config().name("test").debug(true).port(8080);
-        Y.resources().bind("/", new Action() {
-
-            @Override
-            protected void exec(Request req, Response resp) {
-                Interrupt.on(this).redirect("http://www.baidu.com");
-            }
-
-        });
-        Y.resources().bind("/test/base", new Action() {
-
-            @Override
-            protected void exec(Request req, Response resp) {
-                Interrupt.on(this).render(
-                    View.Html.one().text("<h1>Hello World!///sd</h1>"));
-            }
-
-        });
-        Y.resources().bind("/test/echo", new Action() {
-
-            @Override
-            protected void exec(Request req, Response resp) {
-                Interrupt.on(this).render(
-                    View.Html.one().text("<h1>" + req.toString() + "</h1>"));
-            }
-
-        });
-        Y.resources().bind("/test/onlypost", new Action() {
-
-            @Override
-            protected void exec(Request req, Response resp) {
-            }
-
-        }.on(HttpMethod.POST));
-
-        Y.start();
+        _1();
     }
 
 }

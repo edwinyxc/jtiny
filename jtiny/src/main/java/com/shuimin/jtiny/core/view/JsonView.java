@@ -2,6 +2,7 @@ package com.shuimin.jtiny.core.view;
 
 import com.alibaba.fastjson.JSON;
 import com.shuimin.base.S;
+
 import java.util.Map;
 
 public class JsonView extends TextView {

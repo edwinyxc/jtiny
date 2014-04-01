@@ -1,11 +1,11 @@
 package com.shuimin.jtiny.core;
 
 import com.shuimin.base.f.Callback;
-import com.shuimin.jtiny.core.http.Response;
-import java.io.InputStream;
-
 import com.shuimin.jtiny.core.view.StreamView;
 import com.shuimin.jtiny.core.view.TextView;
+import com.shuimin.jtiny.http.Response;
+
+import java.io.InputStream;
 
 /**
  *

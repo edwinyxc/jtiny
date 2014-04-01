@@ -1,11 +1,11 @@
 package com.shuimin.jtiny.core.view;
 
-import java.io.InputStream;
-
 import com.shuimin.base.S;
 import com.shuimin.jtiny.core.View;
-import com.shuimin.jtiny.core.http.Response;
+import com.shuimin.jtiny.http.Response;
+
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Top abstract View of Blob Value

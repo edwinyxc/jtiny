@@ -2,7 +2,7 @@ package com.shuimin.jtiny.core.view;
 
 
 import com.shuimin.jtiny.core.View;
-import com.shuimin.jtiny.core.http.Response;
+import com.shuimin.jtiny.http.Response;
 
 /**
  * Top abstract View of Text Value
@@ -21,7 +21,7 @@ public class TextView extends View {
 	public static TextView one() {
 		return (TextView) new TextView("").onRender(
 				(resp) -> {
-					resp.contentType("text/html;charset=utf8j");
+					resp.contentType("text/html;charset=utf8");
 				});
 	}
 

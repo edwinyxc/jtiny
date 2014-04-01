@@ -1,6 +1,7 @@
 package com.shuimin.jtiny.db;
 
-import com.shuimin.jtiny.core.model.RowMapper;
+import com.shuimin.jtiny.model.RowMapper;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
