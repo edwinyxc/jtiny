@@ -10,7 +10,6 @@ import java.util.Map;
  * event
  *
  * @author ed
- *
  */
 public interface Request {
 

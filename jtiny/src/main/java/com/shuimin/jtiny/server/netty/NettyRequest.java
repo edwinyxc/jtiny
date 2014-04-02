@@ -15,7 +15,6 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- *
  * @author ed
  */
 public class NettyRequest extends AbstractRequest {
@@ -42,18 +41,18 @@ public class NettyRequest extends AbstractRequest {
             = httpRequest.headers().get(HttpHeaders.Names.COOKIE);
         cookies = S.list.one(S._for(CookieDecoder
             .decode(cookie_str != null ? cookie_str : "")).<Cookie>map((cookie) -> {
-                Cookie sc = new Cookie(cookie.getName(), cookie.getValue());
-                if (S.str.notBlank(cookie.getDomain())) {
-                    sc.setDomain(cookie.getDomain());
-                }
-                sc.setMaxAge((int) cookie.getMaxAge());
-                sc.setHttpOnly(cookie.isHttpOnly());
-                sc.setPath(cookie.getPath());
-                sc.setSecure(cookie.isSecure());
-                sc.setVersion(cookie.getVersion());
-                sc.setComment(cookie.getComment());
-                return sc;
-            }).val());
+            Cookie sc = new Cookie(cookie.getName(), cookie.getValue());
+            if (S.str.notBlank(cookie.getDomain())) {
+                sc.setDomain(cookie.getDomain());
+            }
+            sc.setMaxAge((int) cookie.getMaxAge());
+            sc.setHttpOnly(cookie.isHttpOnly());
+            sc.setPath(cookie.getPath());
+            sc.setSecure(cookie.isSecure());
+            sc.setVersion(cookie.getVersion());
+            sc.setComment(cookie.getComment());
+            return sc;
+        }).val());
 
         S._for(httpRequest.headers().names()).each((name) -> {
             String[] head = S._for(httpRequest.headers().getAll(name)).join();
@@ -63,7 +62,7 @@ public class NettyRequest extends AbstractRequest {
 
         parameterMap
             = S._for(queryStringDecoder.parameters()).<String[]>map(
-                (list) -> (S.array.of(list))).val();
+            (list) -> (S.array.of(list))).val();
 
         in = new NettyInputStream(httpRequest);
 

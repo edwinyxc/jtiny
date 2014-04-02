@@ -12,7 +12,6 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 
 /**
- *
  * @author ed
  */
 public class NettyResponse implements Response {
@@ -54,7 +53,7 @@ public class NettyResponse implements Response {
     public Response cookie(Cookie c) {
         httpResponse.headers()
             .add(HttpHeaders.Names.SET_COOKIE,
-                 ServerCookieEncoder.encode(c.getName(), c.getValue()));
+                ServerCookieEncoder.encode(c.getName(), c.getValue()));
         return this;
     }
 

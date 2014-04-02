@@ -30,21 +30,21 @@ public class NettyServer implements Server {
         try {
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup)
-                    .channel(NioServerSocketChannel.class)
-                    .childHandler(new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        public void initChannel(SocketChannel ch)
+                .channel(NioServerSocketChannel.class)
+                .childHandler(new ChannelInitializer<SocketChannel>() {
+                    @Override
+                    public void initChannel(SocketChannel ch)
                         throws Exception {
-                            ch.pipeline()
+                        ch.pipeline()
                             .addLast("codec", new HttpServerCodec())
                             .addLast(new HttpObjectAggregator(1048576))
                             .addLast(new HttpContentCompressor())
                             .addLast("chunkedWriter", new ChunkedWriteHandler())
                             .addLast(new HttpServerHandler(reqHandler));
-                        }
-                    })
-                    .option(ChannelOption.SO_BACKLOG, 128)
-                    .childOption(ChannelOption.SO_KEEPALIVE, true);
+                    }
+                })
+                .option(ChannelOption.SO_BACKLOG, 128)
+                .childOption(ChannelOption.SO_KEEPALIVE, true);
 
             // Bind and start to accept incoming connections.
             severFuture = b.bind(port).sync();

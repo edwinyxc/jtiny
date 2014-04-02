@@ -20,7 +20,7 @@ import static io.netty.handler.codec.http.HttpHeaders.isKeepAlive;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public class HttpServerHandler
-        extends SimpleChannelInboundHandler<FullHttpRequest> {
+    extends SimpleChannelInboundHandler<FullHttpRequest> {
 
     final RequestHandler handler; // THE DISPATCHER
 
@@ -30,16 +30,16 @@ public class HttpServerHandler
 
     @Override
     protected void messageReceived(ChannelHandlerContext ctx,
-            FullHttpRequest msg)
-            throws Exception {
+                                   FullHttpRequest msg)
+        throws Exception {
         FullHttpRequest f_req = msg;
         FullHttpResponse f_resp
-                = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
-                        Unpooled.buffer());
+            = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
+            Unpooled.buffer());
 
         try {
             handler.handle(new NettyRequest(f_req, ctx.channel()),
-                    new NettyResponse(f_resp));
+                new NettyResponse(f_resp));
 //            Y.debug("after dispatch");
 //            Y.debug(f_resp.getStatus());
 //            Y.debug(f_resp.headers());
@@ -48,7 +48,7 @@ public class HttpServerHandler
             if (isKeepAlive(f_req)) {
                 //length
                 f_resp.headers().set(
-                        CONTENT_LENGTH, f_resp.content().readableBytes());
+                    CONTENT_LENGTH, f_resp.content().readableBytes());
                 f_resp.headers().set(CONNECTION, KEEP_ALIVE);
             }
             ChannelFuture last = ctx.write(f_resp);

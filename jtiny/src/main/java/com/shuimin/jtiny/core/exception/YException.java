@@ -3,7 +3,6 @@ package com.shuimin.jtiny.core.exception;
 import com.shuimin.jtiny.Server.G;
 
 /**
- *
  * @author ed
  */
 public abstract class YException extends RuntimeException {
@@ -29,6 +28,6 @@ public abstract class YException extends RuntimeException {
 
     @Override
     public String toString() {
-        return G.debug()? detail() : brief();
+        return G.debug() ? detail() : brief();
     }
 }

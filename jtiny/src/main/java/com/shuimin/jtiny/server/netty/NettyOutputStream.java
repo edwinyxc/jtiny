@@ -8,7 +8,6 @@ import javax.servlet.ServletOutputStream;
 import java.io.IOException;
 
 
-
 public class NettyOutputStream extends ServletOutputStream {
 
     private final FullHttpResponse response;

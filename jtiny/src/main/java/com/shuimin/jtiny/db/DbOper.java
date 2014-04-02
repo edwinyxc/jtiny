@@ -15,14 +15,13 @@ import java.sql.SQLException;
  * <a DAO base Class>
  * encapsoluate some basic method to operate database connection
  *
- *
  * @author edwin
- *
- * <pre>
- *  ?????? ?? conn??????
- *  date:2010-4-2;
- *  modified :2013/7/2 --?? ? connection ?????
- * </pre>
+ *         <p/>
+ *         <pre>
+ *          ?????? ?? conn??????
+ *          date:2010-4-2;
+ *          modified :2013/7/2 --?? ? connection ?????
+ *         </pre>
  */
 public class DbOper {
 
@@ -90,13 +89,12 @@ public class DbOper {
     }
 
     /**
-     *
      * @param sql
      * @param params ?????? inputstream ?????blob
      * @return
      */
     public int executeUpdate(String sql, Object[] params)
-            throws SQLException {
+        throws SQLException {
         if (pstmt != null) {
             _closeStmt();
         }
@@ -112,7 +110,7 @@ public class DbOper {
                 } else if (o instanceof InputStream) {
                     try {
                         pstmt.setBinaryStream(i + 1,
-                                (InputStream) o, ((InputStream) o).available());
+                            (InputStream) o, ((InputStream) o).available());
                     } catch (IOException ex) {
                         S._lazyThrow(ex);
                     }
@@ -158,7 +156,7 @@ public class DbOper {
         return executeUpdate(sql, null);
     }
 
-//	/**
+    //	/**
 //	 * execute SQL statements to Update,Modify or Delete
 //	 */
 //	public int executeUpdate(String sql, String[] params) throws SQLException {

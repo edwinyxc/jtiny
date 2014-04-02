@@ -7,19 +7,19 @@ import java.util.Map;
 
 public class JsonView extends TextView {
 
-	protected JsonView(Map map) {
-		super(JSON.toJSONString(S._notNull(map)));
-	}
+    protected JsonView(Map map) {
+        super(JSON.toJSONString(S._notNull(map)));
+    }
 
-	protected JsonView() {
-		super("");
-	}
+    protected JsonView() {
+        super("");
+    }
 
-	public static JsonView one(Map map) {
-		return new JsonView(map);
-	}
+    public static JsonView one(Map map) {
+        return new JsonView(map);
+    }
 
-	public JsonView of(Map map) {
-		return new JsonView(map);
-	}
+    public JsonView of(Map map) {
+        return new JsonView(map);
+    }
 }

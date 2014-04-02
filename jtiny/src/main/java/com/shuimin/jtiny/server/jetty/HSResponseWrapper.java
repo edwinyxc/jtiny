@@ -10,7 +10,6 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 
 /**
- *
  * @author ed
  */
 public class HSResponseWrapper implements Response {
@@ -42,7 +41,7 @@ public class HSResponseWrapper implements Response {
         return this;
     }
 
-//    @Override
+    //    @Override
 //    public PrintWriter writer() {
 //        try {
 //            return _resp.getWriter();

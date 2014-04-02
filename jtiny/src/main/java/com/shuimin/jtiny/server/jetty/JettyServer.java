@@ -26,13 +26,13 @@ public class JettyServer implements Server {
         server.setHandler(new AbstractHandler() {
             @Override
             public void handle(String target, Request baseRequest,
-                    HttpServletRequest request,
-                    HttpServletResponse response)
-                    throws IOException, ServletException {
+                               HttpServletRequest request,
+                               HttpServletResponse response)
+                throws IOException, ServletException {
 
                 handler.handle(
-                        new HSRequestWrapper(request),
-                        new HSResponseWrapper(response));
+                    new HSRequestWrapper(request),
+                    new HSResponseWrapper(response));
             }
         });
         try {

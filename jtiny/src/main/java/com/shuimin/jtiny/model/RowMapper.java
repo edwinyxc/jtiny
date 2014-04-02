@@ -3,7 +3,6 @@ package com.shuimin.jtiny.model;
 import java.sql.ResultSet;
 
 /**
- *
  * @author ed
  */
 public interface RowMapper {
