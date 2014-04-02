@@ -4,7 +4,7 @@ import com.shuimin.base.S;
 import com.shuimin.jtiny.core.Executor;
 import com.shuimin.jtiny.mw.Action;
 import com.shuimin.jtiny.mw.Dispatcher;
-import com.shuimin.jtiny.mw.Router;
+import com.shuimin.jtiny.mw.router.Router;
 
 import static com.shuimin.jtiny.Server.BasicServer.jetty;
 
@@ -22,10 +22,9 @@ public class AppTest {
 
         final Dispatcher dispatcher = new Dispatcher(new Router.RegexRouter());
         dispatcher.make(ctx -> {
-            ctx.route("/", Action.simple((req, resp) -> {
-                resp.redirect("http://baidu.com");
+            ctx.get("/", Action.simple((req, resp) -> {
             }));
-        })
+        });
 
         //config begin
 
