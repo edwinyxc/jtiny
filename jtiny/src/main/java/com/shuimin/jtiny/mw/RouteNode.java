@@ -7,7 +7,7 @@ import com.shuimin.jtiny.mw.router.RegexPathMatcher;
 
 
 /**
- * Created by ed on 2014/4/2.
+ * Created by ed interrupt 2014/4/2.
  */
 public interface  RouteNode extends Middleware{
     public PathMather mather();

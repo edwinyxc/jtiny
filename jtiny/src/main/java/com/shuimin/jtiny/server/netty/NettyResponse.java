@@ -11,6 +11,8 @@ import javax.servlet.http.Cookie;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 
+import static com.shuimin.jtiny.Interrupt.jumpOut;
+
 /**
  * @author ed
  */
@@ -40,7 +42,7 @@ public class NettyResponse implements Response {
         HttpResponseStatus status = HttpResponseStatus.valueOf(code);
         httpResponse.setStatus(status);
         writer().println(status.toString());
-        Interrupt.on(this).jumpOut();//throw a signal
+        jumpOut(this);//throw a signal
     }
 
     @Override
@@ -61,7 +63,7 @@ public class NettyResponse implements Response {
     public void redirect(String url) {
         httpResponse.setStatus(HttpResponseStatus.MOVED_PERMANENTLY);
         httpResponse.headers().add(HttpHeaders.Names.LOCATION, url);
-        Interrupt.on(this).jumpOut();//throw a signal
+        jumpOut(this);//throw a signal
     }
 
     @Override

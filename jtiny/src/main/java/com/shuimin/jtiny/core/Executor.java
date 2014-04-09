@@ -1,5 +1,6 @@
 package com.shuimin.jtiny.core;
 
+import com.shuimin.base.S;
 import com.shuimin.jtiny.ExecutionContext;
 import com.shuimin.jtiny.Interrupt;
 import com.shuimin.jtiny.Middleware;
@@ -41,7 +42,7 @@ public class Executor implements Y {
     @Override
     public void handle(Request req, Response resp) {
         try {
-            head = Middleware.string(Arrays.of(mwList));
+            head = Middleware.string(S.array.of(mwList));
             if (head == null) {
                 G.logger().info("nothing to do");
                 return;

@@ -7,38 +7,59 @@ import com.shuimin.jtiny.core.exception.YException;
 /**
  * @author ed
  */
-public class Interrupt {
+public interface Interrupt {
 
-    public Object caller;
 
-    private Interrupt(Object caller) {
-        this.caller = caller;
+    public static abstract class Interruption extends YException {
+        private static final Object fakeCause = new Object() {
+            @Override
+            public String toString() {
+                return "This is an interrupt with no cause";
+            }
+        };
+
+        public Interruption() {
+            super(fakeCause);
+        }
+
+        public Interruption(Object cause) {
+            super(cause);
+        }
+
+        @Override
+        public Throwable fillInStackTrace() {
+            return this;
+        }
     }
 
-    public static Interrupt on(Object o) {
-        return new Interrupt(o);
+    public static void redirect(String uri) {
+        throw new RedirectInterruption(uri);
     }
 
-    public void redirect(String uri) {
-        throw new RedirectInterruption(caller, uri);
+    public static void render(View view) {
+        throw new RenderViewInterruption(view);
     }
 
-    public void render(View view) {
-        throw new RenderViewInterruption(caller, view);
+    public static void jumpOut() {
+        throw new JumpInterruption();
     }
 
-    public void jumpOut() {
-        throw new JumpInterruption(caller);
+    public static void jumpOut(Object cause) {
+        throw new JumpInterruption(cause);
     }
 
     /**
      * used in a interception chain to jump out the chain
      */
     @SuppressWarnings("serial")
-    public static class JumpInterruption extends YException {
+    public static class JumpInterruption extends Interruption {
 
         public JumpInterruption(Object cause) {
             super(cause);
+        }
+
+        public JumpInterruption() {
+            super();
         }
 
         @Override
@@ -54,7 +75,7 @@ public class Interrupt {
     }
 
     @SuppressWarnings("serial")
-    public static class RedirectInterruption extends YException {
+    public static class RedirectInterruption extends Interruption {
 
         final private String _uri;
 
@@ -62,8 +83,8 @@ public class Interrupt {
             return _uri;
         }
 
-        public RedirectInterruption(Object o, String uri) {
-            super(o);
+        public RedirectInterruption(String uri) {
+            super();
             _uri = S._notNull(uri);
         }
 
@@ -79,7 +100,7 @@ public class Interrupt {
     }
 
     @SuppressWarnings("serial")
-    public static class RenderViewInterruption extends YException {
+    public static class RenderViewInterruption extends Interruption {
 
         final private View _view;
 
@@ -87,8 +108,8 @@ public class Interrupt {
             return _view;
         }
 
-        public RenderViewInterruption(Object cause, View view) {
-            super(cause);
+        public RenderViewInterruption(View view) {
+            super();
             _view = S._notNull(view);
         }
 

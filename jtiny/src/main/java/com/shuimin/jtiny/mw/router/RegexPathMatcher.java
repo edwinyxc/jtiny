@@ -8,7 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created by ed on 2014/4/2.
+ * Created by ed interrupt 2014/4/2.
  */
 public class RegexPathMatcher implements  PathMather {
 

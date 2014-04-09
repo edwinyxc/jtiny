@@ -18,6 +18,8 @@ public class HSRequestWrapper extends AbstractRequest {
 
     HttpServletRequest _req;
 
+    Map<String,String[]> paramsMap;
+
     public HSRequestWrapper(HttpServletRequest req) {
         _req = req;
     }
@@ -48,7 +50,10 @@ public class HSRequestWrapper extends AbstractRequest {
 
     @Override
     public Map<String, String[]> params() {
-        return _req.getParameterMap();
+        if(paramsMap == null) {
+            paramsMap = new HashMap<>(_req.getParameterMap());
+        }
+        return paramsMap;
     }
 
     @Override
