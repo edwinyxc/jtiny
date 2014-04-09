@@ -1,6 +1,6 @@
 package com.shuimin.jtiny.core.exception;
 
-import com.shuimin.jtiny.Server.G;
+import com.shuimin.jtiny.core.Server.G;
 
 /**
  * @author ed
