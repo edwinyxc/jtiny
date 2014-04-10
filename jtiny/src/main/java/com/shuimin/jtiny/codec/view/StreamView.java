@@ -2,7 +2,6 @@ package com.shuimin.jtiny.codec.view;
 
 import com.shuimin.base.S;
 import com.shuimin.jtiny.core.http.Response;
-import com.shuimin.jtiny.codec.View;
 
 import java.io.IOException;
 import java.io.InputStream;

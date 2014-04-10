@@ -1,7 +1,7 @@
 package com.shuimin.jtiny.core;
 
 import com.shuimin.base.S;
-import com.shuimin.jtiny.codec.View;
+import com.shuimin.jtiny.codec.view.View;
 import com.shuimin.jtiny.core.exception.YException;
 
 /**

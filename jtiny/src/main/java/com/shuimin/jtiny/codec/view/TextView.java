@@ -2,7 +2,6 @@ package com.shuimin.jtiny.codec.view;
 
 
 import com.shuimin.jtiny.core.http.Response;
-import com.shuimin.jtiny.codec.View;
 
 /**
  * Top abstract View of Text Value

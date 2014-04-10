@@ -1,9 +1,7 @@
-package com.shuimin.jtiny.codec;
+package com.shuimin.jtiny.codec.view;
 
 import com.shuimin.base.f.Callback;
 import com.shuimin.jtiny.core.http.Response;
-import com.shuimin.jtiny.codec.view.StreamView;
-import com.shuimin.jtiny.codec.view.TextView;
 
 import java.io.InputStream;
 

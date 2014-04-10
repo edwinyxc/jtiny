@@ -3,7 +3,7 @@ package com.shuimin.jtiny;
 import com.shuimin.base.S;
 import com.shuimin.jtiny.core.Executor;
 import com.shuimin.jtiny.core.Server;
-import com.shuimin.jtiny.codec.View;
+import com.shuimin.jtiny.codec.view.View;
 import com.shuimin.jtiny.core.mw.Action;
 import com.shuimin.jtiny.core.mw.Dispatcher;
 import com.shuimin.jtiny.core.mw.router.Router;
@@ -19,7 +19,6 @@ public class CoreTest {
             resp.writer().print("sddd");
         }).listen(9090);
 
-        Server.basis(jetty).use((req, resp) -> S.echo(req)).listen(8080);
     }
 
     public static void _1() {
