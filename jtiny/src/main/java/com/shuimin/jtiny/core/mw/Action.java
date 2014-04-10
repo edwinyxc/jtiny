@@ -7,6 +7,7 @@ import com.shuimin.jtiny.core.ExecutionContext;
 import com.shuimin.jtiny.core.http.Request;
 import com.shuimin.jtiny.core.http.Response;
 
+
 /**
  * @author ed
  */
@@ -15,11 +16,10 @@ public abstract class Action extends AbstractMiddleware {
 
     public static Action simple(Callback._2<Request, Response> cb) {
         return new Action() {
-
             @Override
             public ExecutionContext handle(ExecutionContext ctx) {
                 cb.apply(ctx.req(), ctx.resp());
-                return null;
+                return ctx;
             }
 
         };
@@ -32,7 +32,7 @@ public abstract class Action extends AbstractMiddleware {
             public ExecutionContext handle(ExecutionContext ctx) {
                 T val = (T) ctx.last();
                 cb.apply(val);
-                return null;
+                return ctx;
             }
         };
     }

@@ -21,6 +21,7 @@ public class CoreTest {
 
     }
 
+
     public static void _1() {
 
         final Executor app = new Executor();
@@ -53,7 +54,6 @@ public class CoreTest {
         app.use(dispatcher);
 
         Server.global().mode(Server.RunningMode.debug);
-
         Server.basis(jetty)
             .use(app).listen(9090);
     }

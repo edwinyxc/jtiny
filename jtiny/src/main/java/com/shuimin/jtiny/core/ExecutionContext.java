@@ -24,6 +24,8 @@ public interface ExecutionContext {
      */
     public Object last();
 
+    //TODO :加入type-safe
+
     static ExecutionContext init(ExecutionContextProvider provider) {
         return provider.provide();
     }

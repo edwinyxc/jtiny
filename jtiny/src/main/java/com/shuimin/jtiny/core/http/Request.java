@@ -19,6 +19,7 @@ public interface Request {
 
     String uri();
 
+    @Deprecated
     Locale locale();
 
     Map<String, String[]> headers();
@@ -31,6 +32,7 @@ public interface Request {
 
     Request param(String para, String value);
 
+    @Deprecated
     String[] paramArray(String para);
 
     String method();
