@@ -16,8 +16,7 @@ public interface Router {
 
     Middleware route(ExecutionContext ctx);
 
-    Router add(HttpMethod method,String pattern, Middleware... mw);
-    //TODO 添加多http方法支持
+    Router add(int methodMask, String pattern, Middleware... mw);
 
     public static class RegexRouter implements Router {
 
@@ -39,11 +38,14 @@ public interface Router {
         }
 
         @Override
-        public Router add(HttpMethod method, String path, Middleware... wares) {
-            List<RouteNode> routes = Routes.get(method);
-            S._assert(routes,"routes of method["+method.toString()+"] not found");
-            synchronized (routes) {
-                routes.add(RouteNode.regexRouteNode(path, Middleware.string(wares)));
+        public Router add(int methodMask, String path, Middleware... wares) {
+            List<HttpMethod> methods = HttpMethod.unMask(methodMask);
+            for (HttpMethod m : methods) {
+                List<RouteNode> routes = Routes.get(m);
+                S._assert(routes, "routes of method[" + methods.toString() + "] not found");
+                synchronized (routes) {
+                    routes.add(RouteNode.regexRouteNode(path, Middleware.string(wares)));
+                }
             }
             return this;
         }

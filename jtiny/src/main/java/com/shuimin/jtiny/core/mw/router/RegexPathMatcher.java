@@ -24,6 +24,7 @@ public class RegexPathMatcher implements  PathMather {
         StringBuffer buffer = new StringBuffer();
         while(matcher.find()){
             pathVarNames.add(matcher.group(1));
+            //FIXME: url中最后一个 ‘/’ 的问题
             matcher.appendReplacement(buffer, "([^/]+)");
         }
         matcher.appendTail(buffer);
