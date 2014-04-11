@@ -31,7 +31,7 @@ public interface  RouteNode extends Middleware {
             }
 
             @Override
-            public ExecutionContext exec(ExecutionContext ctx) throws Throwable {
+            public ExecutionContext exec(ExecutionContext ctx)  {
                 return ware.exec(ctx);
             }
 

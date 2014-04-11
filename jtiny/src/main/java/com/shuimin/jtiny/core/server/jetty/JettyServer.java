@@ -1,8 +1,7 @@
 package com.shuimin.jtiny.core.server.jetty;
 
 import com.shuimin.base.S;
-import com.shuimin.jtiny.core.RequestHandler;
-import com.shuimin.jtiny.core.Server;
+import com.shuimin.jtiny.core.server.AbstractServer;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
@@ -14,11 +13,10 @@ import java.io.IOException;
 /**
  * @author ed
  */
-public class JettyServer implements Server {
+public class JettyServer extends AbstractServer {
 
     private org.eclipse.jetty.server.Server server;
 
-    private RequestHandler handler;
 
     @Override
     public void listen(int port) {
@@ -30,7 +28,7 @@ public class JettyServer implements Server {
                                HttpServletResponse response)
                 throws IOException, ServletException {
 
-                handler.handle(
+                chainedHandler.handle(
                     new HSRequestWrapper(request),
                     new HSResponseWrapper(response));
             }
@@ -49,12 +47,6 @@ public class JettyServer implements Server {
         } catch (Exception e) {
             S._lazyThrow(e);
         }
-    }
-
-    @Override
-    public Server use(RequestHandler handler) {
-        this.handler = handler;
-        return this;
     }
 
 }

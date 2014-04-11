@@ -1,4 +1,4 @@
-package com.shuimin.jtiny.core;
+package com.shuimin.jtiny.core.misc;
 
 /**
  * @author ed

@@ -2,16 +2,15 @@ package com.shuimin.jtiny.core.server.netty;
 
 import com.shuimin.jtiny.core.Interrupt;
 import com.shuimin.jtiny.core.http.Response;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.ServerCookieEncoder;
+import io.netty.handler.stream.ChunkedFile;
 
 import javax.servlet.http.Cookie;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-
-import static com.shuimin.jtiny.core.Interrupt.jump;
+import java.io.*;
 
 /**
  * @author ed
@@ -20,15 +19,19 @@ public class NettyResponse implements Response {
 
     private final FullHttpResponse httpResponse;
 
+    private final ChannelHandlerContext ctx;
+
     private final OutputStream out;
 
     private final PrintWriter pw;
 
     public NettyResponse(
-        FullHttpResponse httpResponse) {
+        FullHttpResponse httpResponse,
+        ChannelHandlerContext ctx) {
         this.httpResponse = httpResponse;
         this.out = new NettyOutputStream(httpResponse);
         this.pw = new PrintWriter(out);
+        this.ctx = ctx;
     }
 
     @Override
@@ -38,11 +41,39 @@ public class NettyResponse implements Response {
     }
 
     @Override
+    public void send(int code) {
+        HttpResponseStatus status = HttpResponseStatus.valueOf(code);
+        httpResponse.setStatus(status);
+        Interrupt.jump(this);//throw a signal
+    }
+
+    @Override
     public void sendError(int code, String msg) {
         HttpResponseStatus status = HttpResponseStatus.valueOf(code);
         httpResponse.setStatus(status);
-        writer().println(status.toString());
+        writer().print(msg);
         Interrupt.jump(this);//throw a signal
+
+    }
+
+    @Override
+    public void sendFile(File file) {
+        RandomAccessFile raf ;
+        long fileLength = 0L;
+        try {
+            raf = new RandomAccessFile(file, "r");
+        }catch (FileNotFoundException e){
+            send(404);
+            return;
+        }
+        try {
+            fileLength = raf.length();
+            ctx.write(
+                new ChunkedFile(raf,0,fileLength,8192), ctx.newProgressivePromise());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Interrupt.jump(this);
     }
 
     @Override
@@ -80,6 +111,12 @@ public class NettyResponse implements Response {
     @Override
     public PrintWriter writer() {
         return pw;
+    }
+
+    @Override
+    public Response write(String s) {
+        ctx.write(s);
+        return this;
     }
 
 }

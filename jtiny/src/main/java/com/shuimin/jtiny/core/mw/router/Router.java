@@ -37,23 +37,23 @@ public interface Router {
 //            throw new HttpException(404, "request " + req.toString() + "not found");
         }
 
+        @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
         @Override
         public Router add(int methodMask, String path, Middleware... wares) {
             List<HttpMethod> methods = HttpMethod.unMask(methodMask);
             for (HttpMethod m : methods) {
                 List<RouteNode> routes = Routes.get(m);
                 S._assert(routes, "routes of method[" + methods.toString() + "] not found");
-                synchronized (routes) {
-                    routes.add(RouteNode.regexRouteNode(path, Middleware.string(wares)));
-                }
+                routes.add(RouteNode.regexRouteNode(path, Middleware.string(wares)));
             }
             return this;
         }
 
         private static class Routes {
+            @SuppressWarnings("unchecked")
             final private static List<RouteNode>[] all = new List[HttpMethod.values().length];
 
-            final static List<RouteNode> get(HttpMethod method) {
+            static List<RouteNode> get(HttpMethod method) {
                 List<RouteNode> ret = all[method.ordinal()];
                 if (ret == null) {
                     ret = (all[method.ordinal()] = new LinkedList<>());

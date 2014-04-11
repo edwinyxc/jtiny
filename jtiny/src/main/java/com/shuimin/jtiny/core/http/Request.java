@@ -33,7 +33,7 @@ public interface Request {
     Request param(String para, String value);
 
     @Deprecated
-    String[] paramArray(String para);
+    String[] params(String para);
 
     String method();
 

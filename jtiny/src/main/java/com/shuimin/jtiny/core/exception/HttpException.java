@@ -33,4 +33,6 @@ public class HttpException extends YException {
     public String detail() {
         return brief() + ": " + getMessage();
     }
+
+
 }

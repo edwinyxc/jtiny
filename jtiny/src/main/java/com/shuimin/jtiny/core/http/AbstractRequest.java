@@ -46,7 +46,7 @@ public abstract class AbstractRequest implements Request {
     }
 
     @Override
-    public String[] paramArray(String name) {
+    public String[] params(String name) {
         return params().get(name);
     }
 

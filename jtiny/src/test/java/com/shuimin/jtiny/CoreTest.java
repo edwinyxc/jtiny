@@ -1,11 +1,10 @@
 package com.shuimin.jtiny;
 
 import com.shuimin.base.S;
-import com.shuimin.jtiny.core.Executor;
 import com.shuimin.jtiny.core.Server;
 import com.shuimin.jtiny.codec.view.View;
 import com.shuimin.jtiny.core.mw.Action;
-import com.shuimin.jtiny.core.mw.Dispatcher;
+import com.shuimin.jtiny.core.Dispatcher;
 import com.shuimin.jtiny.core.mw.router.Router;
 
 import static com.shuimin.jtiny.core.Interrupt.render;
@@ -24,7 +23,6 @@ public class CoreTest {
 
     public static void _1() {
 
-        final Executor app = new Executor();
 
         final Dispatcher dispatcher = new Dispatcher(new Router.RegexRouter());
 
@@ -51,11 +49,10 @@ public class CoreTest {
 
         //config begin
 
-        app.use(dispatcher);
 
         Server.global().mode(Server.RunningMode.debug);
         Server.basis(jetty)
-            .use(app).listen(9090);
+            .use(dispatcher).listen(9090);
     }
 
     public static void main(String[] args) {

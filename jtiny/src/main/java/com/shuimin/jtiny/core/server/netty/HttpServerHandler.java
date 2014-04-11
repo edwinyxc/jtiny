@@ -39,7 +39,7 @@ public class HttpServerHandler
 
         try {
             handler.handle(new NettyRequest(f_req, ctx.channel()),
-                new NettyResponse(f_resp));
+                new NettyResponse(f_resp,ctx));
 //            MiddlewareContext.debug("after dispatch");
 //            MiddlewareContext.debug(f_resp.getStatus());
 //            MiddlewareContext.debug(f_resp.headers());

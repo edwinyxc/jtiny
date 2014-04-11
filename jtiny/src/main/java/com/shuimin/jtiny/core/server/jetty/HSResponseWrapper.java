@@ -5,9 +5,9 @@ import com.shuimin.jtiny.core.http.Response;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
+import java.io.*;
+
+import static com.shuimin.base.S._throw;
 
 /**
  * @author ed
@@ -27,11 +27,32 @@ public class HSResponseWrapper implements Response {
     }
 
     @Override
+    public void send(int code) {
+        _resp.setStatus(code);
+        try {
+            _resp.flushBuffer();
+        } catch (IOException e) {
+            _throw(e);
+        }
+    }
+
+    @Override
     public void sendError(int code, String msg) {
         try {
-            _resp.sendError(code, msg);
-        } catch (IOException ex) {
-            S._lazyThrow(ex);
+            _resp.sendError(code,msg);
+        } catch (IOException e) {
+            _throw(e);
+        }
+
+    }
+
+    @Override
+    public void sendFile(File file) {
+        _resp.setStatus(200);
+        try {
+            S.stream.write(new FileInputStream(file), _resp.getOutputStream());
+        } catch (IOException e) {
+           _throw(e);
         }
     }
 
@@ -91,6 +112,12 @@ public class HSResponseWrapper implements Response {
             S._lazyThrow(ex);
         }
         return null;
+    }
+
+    @Override
+    public Response write(String s) {
+        this.writer().print(s);
+        return this;
     }
 
 }

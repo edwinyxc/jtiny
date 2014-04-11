@@ -1,8 +1,7 @@
 package com.shuimin.jtiny.core.server.netty;
 
 import com.shuimin.base.S;
-import com.shuimin.jtiny.core.RequestHandler;
-import com.shuimin.jtiny.core.Server;
+import com.shuimin.jtiny.core.server.AbstractServer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -16,9 +15,8 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.stream.ChunkedWriteHandler;
 
-public class NettyServer implements Server {
+public class NettyServer extends AbstractServer {
 
-    private ServerBootstrap bootstrap;
     private ChannelFuture severFuture;
 
     EventLoopGroup bossGroup = new NioEventLoopGroup();
@@ -40,7 +38,7 @@ public class NettyServer implements Server {
                             .addLast(new HttpObjectAggregator(1048576))
                             .addLast(new HttpContentCompressor())
                             .addLast("chunkedWriter", new ChunkedWriteHandler())
-                            .addLast(new HttpServerHandler(reqHandler));
+                            .addLast(new HttpServerHandler(chainedHandler));
                     }
                 })
                 .option(ChannelOption.SO_BACKLOG, 128)
@@ -66,21 +64,12 @@ public class NettyServer implements Server {
 
     @Override
     public void stop() {
-        if (bootstrap != null) {
-            try {
-                severFuture.channel().closeFuture().sync();
-            } catch (InterruptedException ex) {
-                S._lazyThrow(ex);
-            }
+        try {
+            severFuture.channel().closeFuture().sync();
+        } catch (InterruptedException ex) {
+            S._lazyThrow(ex);
         }
     }
 
-    private RequestHandler reqHandler;
-
-    @Override
-    public Server use(RequestHandler handler) {
-        reqHandler = handler;
-        return this;
-    }
 
 }

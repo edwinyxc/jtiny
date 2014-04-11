@@ -14,17 +14,14 @@ public interface Middleware {
 
     /**
      * return the next
-     *
      */
     public Middleware next(Middleware ware);
 
 
-
-    public default ExecutionContext exec(ExecutionContext ctx)
-        throws Throwable {
+    public default ExecutionContext exec(ExecutionContext ctx) {
         ExecutionContext result = this.handle(ctx);
-        for(Middleware ware = this.next(); ware != null; ware = ware.next()){
-           result =  ware.handle(result);
+        for (Middleware ware = this.next(); ware != null; ware = ware.next()) {
+            result = ware.handle(result);
         }
         return result;
     }
@@ -32,6 +29,7 @@ public interface Middleware {
 
     /**
      * string middlewares together as an sll
+     *
      * @param wares
      * @return
      */
