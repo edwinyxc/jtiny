@@ -43,7 +43,6 @@ public class HSResponseWrapper implements Response {
         } catch (IOException e) {
             _throw(e);
         }
-
     }
 
     @Override

@@ -14,7 +14,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import static com.shuimin.base.S.echo;
 import static com.shuimin.jtiny.core.Server.G.debug;
 
 /**
@@ -52,7 +51,6 @@ public class StaticFileServer implements RequestHandler {
         }
         final String path = req.path();
         final String absPath = validPath(path);
-        echo(absPath);
 
         debug(path);
         if (S.str.isBlank(absPath)) {
@@ -68,9 +66,7 @@ public class StaticFileServer implements RequestHandler {
         }
 
         if (file.isDirectory()) {
-            echo("is dir " + file.getAbsolutePath());
             if(path.endsWith("/")) {
-                echo("enter....");
                 Listing(resp,file);
             } else {
                 resp.redirect(path + '/');
@@ -178,13 +174,6 @@ public class StaticFileServer implements RequestHandler {
         resp.header("Content-Length", String.valueOf(length));
     }
 
-    private static void setDateHeader(Response resp){
-        SimpleDateFormat dateFormat = new SimpleDateFormat(HTTP_DATE_FORMAT,Locale.US);
-        dateFormat.setTimeZone(TimeZone.getTimeZone(HTTP_DATE_GMT_TIMEZONE));
-
-        Calendar time = new GregorianCalendar();
-        resp.header("Date",dateFormat.format(time.getTime()));
-    }
 
     private static void setDateAndCacheHeaders(Response resp, File toCache){
         SimpleDateFormat dateFormat  = new SimpleDateFormat(HTTP_DATE_FORMAT,Locale.US);

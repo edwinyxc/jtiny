@@ -9,6 +9,8 @@ import com.shuimin.jtiny.core.misc.Config;
 import com.shuimin.jtiny.core.misc.Makeable;
 import com.shuimin.jtiny.core.mw.router.Router;
 
+import static com.shuimin.jtiny.core.Interrupt.kill;
+
 /**
  * @author ed
  */
@@ -65,12 +67,15 @@ public class Dispatcher
             if(processor == null) throw new HttpException(404,req.path());
             processor.exec(ctx);
         } catch (Interrupt.JumpInterruption jump) {
-            //if jump do nothing but return the same as the input
-            return;
+            //fire a signal
         } catch (Interrupt.RedirectInterruption redirection) {
             ctx.resp().redirect(redirection.uri());
+            kill();
         } catch (Interrupt.RenderViewInterruption render) {
             render.view().render(ctx.resp());
+            kill();
         }
     }
+
+
 }

@@ -48,6 +48,10 @@ public interface Interrupt {
         throw new JumpInterruption(cause);
     }
 
+    public static void kill() {
+        throw new KillInterruption();
+    }
+
     /**
      * used in a interception chain to jump out the chain
      */
@@ -70,6 +74,32 @@ public interface Interrupt {
         @Override
         public String detail() {
             return "jump out from " + cause();
+        }
+
+    }
+
+    /**
+     * used in a interception chain to jump out the chain
+     */
+    @SuppressWarnings("serial")
+    public static class KillInterruption extends Interruption {
+
+        public KillInterruption(Object cause) {
+            super(cause);
+        }
+
+        public KillInterruption() {
+            super();
+        }
+
+        @Override
+        public String brief() {
+            return "kill ";
+        }
+
+        @Override
+        public String detail() {
+            return "kill by " + cause();
         }
 
     }
