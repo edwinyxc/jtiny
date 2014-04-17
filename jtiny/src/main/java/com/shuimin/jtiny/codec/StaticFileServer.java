@@ -29,8 +29,8 @@ public class StaticFileServer implements RequestHandler,
 
     private Function._0<Pattern> allowedFileNames = () -> Pattern.compile("[A-Za-z0-9][-_A-Za-z0-9\\.]*");
 
-    private Function._0<String[]> defaultPage = () -> new String[]{"index.html"};
-
+//    private Function._0<String[]> defaultPage = () -> new String[]{"index.html"};
+    private String[] defaultPages = {"index.html"};
     private Callback._2<Response, File> listDir = this::defaultListFiles;
 
 
@@ -39,8 +39,8 @@ public class StaticFileServer implements RequestHandler,
         return this;
     }
 
-    public StaticFileServer defaultPages(Function._0<String[]> f) {
-        this.defaultPage = f;
+    public StaticFileServer defaultPages(String... x) {
+        this.defaultPages = x;
         return this;
     }
 
@@ -73,7 +73,7 @@ public class StaticFileServer implements RequestHandler,
 
     private String findDefaultPage(File dir) {
         File[] files = dir.listFiles();
-        String[] names = this.defaultPage.apply();
+        String[] names = defaultPages ;
         for (File f : files) {
             for (String name : names) {
                 if (name.equals(f.getName())) {

@@ -6,12 +6,11 @@ import com.shuimin.base.util.logger.Logger;
 import java.util.HashMap;
 
 /**
- * Created by ed on 2001/1/1.
+ * <p>数据记录抽象</p>
  */
 public class Record extends HashMap<String,Object> {
 
     public static Logger logger = Logger.get();
     public String tableName;
-
 
 }

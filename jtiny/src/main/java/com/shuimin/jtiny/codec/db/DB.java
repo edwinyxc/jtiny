@@ -25,13 +25,13 @@ public class DB implements Makeable<DB>,Closeable {
     private static final Logger logger = Logger.get();
     private JdbcOperator oper;
 
-    private DB() {
+    public DB() {
     }
 
 
-    public static <R,ProcessResult> R DB(Connection connection,
-                                         Function<ProcessResult,JdbcOperator> process,
-                                         Function<R,ProcessResult> finisher) {
+    public static <R, M> R fire(Connection connection,
+                                         Function<M,JdbcOperator> process,
+                                         Function<R, M> finisher) {
 
         try( DB b = new DB().open(() -> connection)){
             return b.exec(process,finisher);
