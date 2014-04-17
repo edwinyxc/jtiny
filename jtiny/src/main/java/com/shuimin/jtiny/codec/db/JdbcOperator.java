@@ -4,6 +4,7 @@ import com.shuimin.base.S;
 import com.shuimin.base.util.logger.Logger;
 import com.shuimin.jtiny.core.Server;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
@@ -23,14 +24,15 @@ import java.sql.SQLException;
  *          modified :2013/7/2 --?? ? connection ?????
  *         </pre>
  */
-public class DbOper {
+public class JdbcOperator implements Closeable{
 
     public final Connection conn;
     public PreparedStatement pstmt = null;
     public ResultSet rs = null;
     Logger logger = Server.G.logger();
 
-    final DbOper outer = this;
+    final JdbcOperator outer = this;
+
 //	//use under jdk -1.4
 //	@SuppressWarnings("unused")
 //	private Object guarder = new Object() {
@@ -40,7 +42,7 @@ public class DbOper {
 //		}
 //	};
 
-    public DbOper(Connection conn) {
+    public JdbcOperator(Connection conn) {
         this.conn = conn;
     }
 
@@ -51,11 +53,11 @@ public class DbOper {
     /**
      * release resource
      */
-    public void disposeAll() {
+    @Override
+    public void close() {
         _closeRs();
         _closeStmt();
         _closeConn();
-
     }
 
     private void _closeStmt() {
@@ -90,7 +92,8 @@ public class DbOper {
 
     /**
      * @param sql
-     * @param params ?????? inputstream ?????blob
+     * @param params 对象数组，用于按顺序放置到sql模板中,支持InputStream 和 基本数据类型
+     *
      * @return
      */
     public int executeUpdate(String sql, Object[] params)
@@ -115,6 +118,11 @@ public class DbOper {
                         S._lazyThrow(ex);
                     }
                 }
+                else {
+                    _debug("not supported type input " + o);
+                   pstmt.setString(i + 1, o.toString());
+                }
+
             }
         }
         _debug(pstmt);
@@ -198,6 +206,11 @@ public class DbOper {
         }
     }
 
+    /**
+     * <p>调用jdbc 的 RollBack
+     * </p>
+     * @throws SQLException
+     */
     public void rollback() throws SQLException {
         conn.rollback();
     }

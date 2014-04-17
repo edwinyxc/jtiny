@@ -1,4 +1,4 @@
-package com.shuimin.jtiny.codec.db;
+package com.shuimin.jtiny.codec.connpool;
 
 
 import java.lang.reflect.InvocationHandler;
@@ -32,11 +32,11 @@ public class ConnectionProxy implements InvocationHandler
 
 	public Connection proxyBind()
 	{
-		Connection proxyConnection = (Connection) Proxy
-			.newProxyInstance(connection.getClass()
-				.getClassLoader(),
-				new Class<?>[] { Connection.class }, this);
-		return proxyConnection;
+        return (Connection) Proxy
+            .newProxyInstance(connection.getClass()
+                .getClassLoader(),
+                new Class<?>[] { Connection.class }, this
+            );
 	}
 
 	public Connection getConnection()

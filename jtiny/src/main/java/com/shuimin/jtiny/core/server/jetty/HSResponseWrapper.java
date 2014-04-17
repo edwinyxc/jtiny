@@ -48,8 +48,8 @@ public class HSResponseWrapper implements Response {
     @Override
     public void sendFile(File file) {
         _resp.setStatus(200);
-        try {
-            S.stream.write(new FileInputStream(file), _resp.getOutputStream());
+        try(FileInputStream in = new FileInputStream(file)){
+            S.stream.write(in,_resp.getOutputStream());
         } catch (IOException e) {
            _throw(e);
         }

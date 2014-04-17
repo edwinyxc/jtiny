@@ -1,11 +1,14 @@
 package com.shuimin.jtiny.codec;
 
 import com.shuimin.base.S;
+import com.shuimin.base.f.Callback;
+import com.shuimin.base.f.Function;
 import com.shuimin.jtiny.core.RequestHandler;
 import com.shuimin.jtiny.core.exception.YException;
 import com.shuimin.jtiny.core.http.HttpMethod;
 import com.shuimin.jtiny.core.http.Request;
 import com.shuimin.jtiny.core.http.Response;
+import com.shuimin.jtiny.core.misc.Makeable;
 
 import javax.activation.MimetypesFileTypeMap;
 import java.io.File;
@@ -14,12 +17,38 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import static com.shuimin.jtiny.core.Server.G.debug;
-
 /**
  * Created by ed on 2014/4/10.
  */
-public class StaticFileServer implements RequestHandler {
+public class StaticFileServer implements RequestHandler,
+    Makeable<StaticFileServer> {
+
+    /**
+     * 允许用户配置的接口
+     */
+
+    private Function._0<Pattern> allowedFileNames = () -> Pattern.compile("[A-Za-z0-9][-_A-Za-z0-9\\.]*");
+
+    private Function._0<String[]> defaultPage = () -> new String[]{"index.html"};
+
+    private Callback._2<Response, File> listDir = this::defaultListFiles;
+
+
+    public StaticFileServer allowedNames(Function._0<Pattern> f) {
+        this.allowedFileNames = f;
+        return this;
+    }
+
+    public StaticFileServer defaultPages(Function._0<String[]> f) {
+        this.defaultPage = f;
+        return this;
+    }
+
+    public StaticFileServer listDir(Callback._2<Response, File> f) {
+        this.listDir = f;
+        return this;
+    }
+
 
     public static final String HTTP_DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss zzz";
     public static final String HTTP_DATE_GMT_TIMEZONE = "GMT";
@@ -42,7 +71,19 @@ public class StaticFileServer implements RequestHandler {
         }
     }
 
-    //TODO: 静态文件服务器，提供缓存策略
+    private String findDefaultPage(File dir) {
+        File[] files = dir.listFiles();
+        String[] names = this.defaultPage.apply();
+        for (File f : files) {
+            for (String name : names) {
+                if (name.equals(f.getName())) {
+                    return name;
+                }
+            }
+        }
+        return null;
+    }
+
     @Override
     public void handle(Request req, Response resp) {
         if (HttpMethod.of(req.method()) != HttpMethod.GET) {
@@ -52,7 +93,6 @@ public class StaticFileServer implements RequestHandler {
         final String path = req.path();
         final String absPath = validPath(path);
 
-        debug(path);
         if (S.str.isBlank(absPath)) {
             resp.send(403);
             return;
@@ -60,14 +100,28 @@ public class StaticFileServer implements RequestHandler {
 
         File file = new File(absPath);
 
+        Pattern allowedNames = this.allowedFileNames.apply();
+
+
+        if (!allowedNames.matcher(file.getName()).matches()) {
+            resp.send(403);
+            return;
+        }
+
         if (file.isHidden() || !file.exists()) {
             resp.send(404);
             return;
         }
 
         if (file.isDirectory()) {
-            if(path.endsWith("/")) {
-                Listing(resp,file);
+            if (path.endsWith("/")) {
+                String tryDefaultPage = findDefaultPage(file);
+                if (tryDefaultPage != null) {
+                    resp.redirect(path + tryDefaultPage);
+                    return;
+                }
+                //do listing
+                listDir.apply(resp, file);
             } else {
                 resp.redirect(path + '/');
             }
@@ -83,7 +137,7 @@ public class StaticFileServer implements RequestHandler {
 
         // Cache Validation
         String[] strings = req.headers().get("If-Modified-Since");
-        if(strings != null && strings.length > 0){
+        if (strings != null && strings.length > 0) {
             SimpleDateFormat dateFormatter = new SimpleDateFormat(HTTP_DATE_FORMAT, Locale.US);
             Date ifModifiedSinceDate = null;
             try {
@@ -99,22 +153,23 @@ public class StaticFileServer implements RequestHandler {
             }
         }
 
-       setContentLength(resp,file.length());
+        setContentLength(resp, file.length());
 
-       setContentType(resp,file);
+        setContentType(resp, file);
 
-       setDateAndCacheHeaders(resp,file);
+        setDateAndCacheHeaders(resp, file);
 
-       resp.sendFile(file);
+        resp.sendFile(file);
 
     }
-    private static final Pattern ALLOWED_FILE_NAME = Pattern.compile("[A-Za-z0-9][-_A-Za-z0-9\\.]*");
 
-    private static void Listing(Response resp,File dir){
+
+    public void defaultListFiles(Response resp, File dir) {
         resp.contentType("text/html; charset=UTF-8");
 
         StringBuilder buf = new StringBuilder();
-        String dirPath = dir.getPath();
+        String dirPath = dir.getPath()
+            .replace(publicDir, "\\").replaceAll("\\\\", "/");
 
         buf.append("<!DOCTYPE html>\r\n");
         buf.append("<html><head><title>");
@@ -129,13 +184,15 @@ public class StaticFileServer implements RequestHandler {
         buf.append("<ul>");
         buf.append("<li><a href=\"../\">..</a></li>\r\n");
 
-        for (File f: dir.listFiles()) {
+        Pattern allowedNames = this.allowedFileNames.apply();
+
+        for (File f : dir.listFiles()) {
             if (f.isHidden() || !f.canRead()) {
                 continue;
             }
 
             String name = f.getName();
-            if (!ALLOWED_FILE_NAME.matcher(name).matches()) {
+            if (!allowedNames.matcher(name).matches()) {
                 continue;
             }
 
@@ -170,13 +227,13 @@ public class StaticFileServer implements RequestHandler {
     }
 
 
-    private static void setContentLength(Response resp, long length){
+    private static void setContentLength(Response resp, long length) {
         resp.header("Content-Length", String.valueOf(length));
     }
 
 
-    private static void setDateAndCacheHeaders(Response resp, File toCache){
-        SimpleDateFormat dateFormat  = new SimpleDateFormat(HTTP_DATE_FORMAT,Locale.US);
+    private static void setDateAndCacheHeaders(Response resp, File toCache) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(HTTP_DATE_FORMAT, Locale.US);
         dateFormat.setTimeZone(TimeZone.getTimeZone(HTTP_DATE_GMT_TIMEZONE));
 
         Calendar time = new GregorianCalendar();
@@ -188,7 +245,7 @@ public class StaticFileServer implements RequestHandler {
         resp.header("Last-Modified", dateFormat.format(new Date(toCache.lastModified())));
     }
 
-    private static void setContentType(Response resp, File file){
+    private static void setContentType(Response resp, File file) {
         MimetypesFileTypeMap mimetypesFileTypeMap = new MimetypesFileTypeMap();
         resp.header("Content-Type", mimetypesFileTypeMap.getContentType(file));
     }

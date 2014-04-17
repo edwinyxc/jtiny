@@ -1,10 +1,10 @@
 package com.shuimin.jtiny;
 
 import com.shuimin.base.S;
-import com.shuimin.jtiny.core.Server;
 import com.shuimin.jtiny.codec.view.View;
-import com.shuimin.jtiny.core.mw.Action;
 import com.shuimin.jtiny.core.Dispatcher;
+import com.shuimin.jtiny.core.Server;
+import com.shuimin.jtiny.core.mw.Action;
 import com.shuimin.jtiny.core.mw.router.Router;
 
 import static com.shuimin.jtiny.core.Interrupt.render;
@@ -17,12 +17,10 @@ public class CoreTest {
             S.echo(req);
             resp.writer().print("sddd");
         }).listen(9090);
-
     }
 
 
     public static void _1() {
-
 
         final Dispatcher dispatcher = new Dispatcher(new Router.RegexRouter());
 
@@ -49,14 +47,23 @@ public class CoreTest {
 
         //config begin
 
-
         Server.global().mode(Server.RunningMode.debug);
+
         Server.basis(jetty)
             .use(dispatcher).listen(9090);
     }
 
+    public static interface SupplyString {
+        public String a ();
+    }
+
+    public static void echo(SupplyString su){
+        S.echo(su.a());
+    }
+
     public static void main(String[] args) {
-        _1();
+        //_1();
+
     }
 
 }

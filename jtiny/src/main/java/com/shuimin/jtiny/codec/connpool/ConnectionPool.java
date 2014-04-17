@@ -1,7 +1,6 @@
-package com.shuimin.jtiny.codec.db;
+package com.shuimin.jtiny.codec.connpool;
 
 import com.shuimin.base.util.logger.Logger;
-import com.shuimin.jtiny.core.Server;
 
 import java.lang.reflect.Proxy;
 import java.sql.Connection;
@@ -12,11 +11,11 @@ import java.util.List;
 
 public class ConnectionPool {
 
-	private Logger logger = Server.G.logger();
+	private Logger logger = Logger.get();
 	private List<Connection> connPool;
 	private int poolMaxSize = 10;
 
-	private int defaultInitSize;
+	private int defaultInitSize = 5;
 	private String driverClass;
 	private String url;
 	private String username;
@@ -30,7 +29,7 @@ public class ConnectionPool {
 
 	}
 
-	public ConnectionPool init(DbConfig config)
+	public ConnectionPool init(ConnectionConfig config)
 			throws SQLException {
 
 		String maxSize = config.maxPoolSize;
@@ -61,7 +60,7 @@ public class ConnectionPool {
 		// this.url = conn_url;
 		//
 
-		connPool = new ArrayList<Connection>();
+		connPool = new ArrayList<>();
 		int size;
 		if (poolMaxSize > defaultInitSize) {
 			size = defaultInitSize;
@@ -107,9 +106,6 @@ public class ConnectionPool {
 	}
 
 	public synchronized Connection getConnection() throws SQLException {
-		// ???????Connection?close()??????
-		// ??????????Connection??????????getConnection()??????????
-		// connectionProxy????????
 		ConnectionProxy connectionProxy = new ConnectionProxy(this);
 		int size = connPool.size();
 		if (connPool.size() == 0 || size > poolMaxSize) {
@@ -118,7 +114,7 @@ public class ConnectionPool {
 		}
 		Connection connection;
 		int i = 1;
-		for (connection = (Connection) connPool.get(size - i); i <= size; i++) {
+		for (connection = connPool.get(size - i); i <= size; i++) {
 			if (connection.isClosed()) {
 				connPool.remove(size - i);
 			} else {

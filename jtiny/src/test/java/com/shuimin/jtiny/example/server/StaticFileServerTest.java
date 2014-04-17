@@ -11,6 +11,7 @@ public class StaticFileServerTest {
     public static void main(String[] args) {
         Server.basis(Server.BasicServer.jetty)
             .use(new StaticFileServer("C:\\var\\www")
+                    .defaultPages(()-> new String[]{"index.html","index.js"})
             ).listen(10000);
     }
 
