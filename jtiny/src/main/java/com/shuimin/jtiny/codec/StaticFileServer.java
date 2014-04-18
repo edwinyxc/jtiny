@@ -3,6 +3,8 @@ package com.shuimin.jtiny.codec;
 import com.shuimin.base.S;
 import com.shuimin.base.f.Callback;
 import com.shuimin.base.f.Function;
+import com.shuimin.jtiny.core.AbstractMiddleware;
+import com.shuimin.jtiny.core.ExecutionContext;
 import com.shuimin.jtiny.core.RequestHandler;
 import com.shuimin.jtiny.core.exception.YException;
 import com.shuimin.jtiny.core.http.HttpMethod;
@@ -17,10 +19,12 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import static com.shuimin.jtiny.core.Interrupt.kill;
+
 /**
  * Created by ed on 2014/4/10.
  */
-public class StaticFileServer implements RequestHandler,
+public class StaticFileServer extends AbstractMiddleware implements RequestHandler,
     Makeable<StaticFileServer> {
 
     /**
@@ -250,4 +254,10 @@ public class StaticFileServer implements RequestHandler,
         resp.header("Content-Type", mimetypesFileTypeMap.getContentType(file));
     }
 
+    @Override
+    public ExecutionContext handle(ExecutionContext ctx) {
+        this.handle(ctx.req(),ctx.resp());
+        kill();
+        return null;
+    }
 }

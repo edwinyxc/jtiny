@@ -2,23 +2,20 @@ package com.shuimin.jtiny.codec.view;
 
 import com.shuimin.base.f.Callback;
 import com.shuimin.jtiny.core.http.Response;
+import com.shuimin.jtiny.core.misc.Renderable;
 
 import java.io.InputStream;
 
 /**
  * @author ed
  */
-public abstract class View {
+public abstract class View implements Renderable {
 
     private Callback<Response> _before
-        = new Callback<Response>() {
+        = t -> {};
 
-        @Override
-        public void apply(Response t) {
-        }
-    };
-
-    public final void render(Response resp) {
+    @Override
+    public void render(Response resp) {
         _before.apply(resp);
         _render(resp);
     }

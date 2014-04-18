@@ -6,6 +6,7 @@ package com.shuimin.jtiny.codec.db;
 public class SQLSupport {
 
     public static class DDL {
+
         /** TODO:
          * CREATE
          * ALTER

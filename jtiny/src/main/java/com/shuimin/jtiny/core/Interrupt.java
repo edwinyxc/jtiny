@@ -1,8 +1,8 @@
 package com.shuimin.jtiny.core;
 
 import com.shuimin.base.S;
-import com.shuimin.jtiny.codec.view.View;
 import com.shuimin.jtiny.core.exception.YException;
+import com.shuimin.jtiny.core.misc.Renderable;
 
 /**
  * @author ed
@@ -36,8 +36,8 @@ public interface Interrupt {
         throw new RedirectInterruption(uri);
     }
 
-    public static void render(View view) {
-        throw new RenderViewInterruption(view);
+    public static void render(Renderable o) {
+        throw new RenderInterruption(o);
     }
 
     public static void jump() {
@@ -130,22 +130,22 @@ public interface Interrupt {
     }
 
     @SuppressWarnings("serial")
-    public static class RenderViewInterruption extends Interruption {
+    public static class RenderInterruption extends Interruption {
 
-        final private View _view;
+        final private Renderable value;
 
-        public View view() {
-            return _view;
+        public Renderable value() {
+            return value;
         }
 
-        public RenderViewInterruption(View view) {
+        public RenderInterruption(Renderable o) {
             super();
-            _view = S._notNull(view);
+            value = o;
         }
 
         @Override
         public String brief() {
-            return "render view " + _view;
+            return "render view " + value;
         }
 
         @Override

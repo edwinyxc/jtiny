@@ -13,6 +13,7 @@ import static com.shuimin.jtiny.core.Interrupt.kill;
 
 /**
  * @author ed
+ * TODO://filter
  */
 public class Dispatcher
     implements Makeable<Dispatcher>,RequestHandler,Attrs<Dispatcher> {
@@ -71,8 +72,8 @@ public class Dispatcher
         } catch (Interrupt.RedirectInterruption redirection) {
             ctx.resp().redirect(redirection.uri());
             kill();
-        } catch (Interrupt.RenderViewInterruption render) {
-            render.view().render(ctx.resp());
+        } catch (Interrupt.RenderInterruption render) {
+            render.value().render(ctx.resp());
             kill();
         }
     }
