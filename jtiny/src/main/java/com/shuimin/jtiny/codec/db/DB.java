@@ -9,10 +9,13 @@ import com.shuimin.jtiny.core.exception.UnexpectedException;
 import com.shuimin.jtiny.core.misc.Makeable;
 
 import java.io.Closeable;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import static com.shuimin.base.S._throw;
 
 /**
  * Created by ed on 2014/4/15.
@@ -21,19 +24,19 @@ import java.sql.SQLException;
  * ，也可以是多个。具体采用连接池还是单个连接（on the fly）取决于构造，
  * 单个DB对象持有一个打开的connection，显示调用的关闭不一定会真的释放connection</p>
  */
-public class DB implements Makeable<DB>,Closeable {
+public class DB implements Makeable<DB>, Closeable {
     private static final Logger logger = Logger.get();
-    private JdbcOperator oper;
+    private JdbcTmpl tmpl;
 
     public DB() {
     }
 
     public static <R, M> R fire(Connection connection,
-                                         Function<M,JdbcOperator> process,
-                                         Function<R, M> finisher) {
+                                Function<M, JdbcTmpl> process,
+                                Function<R, M> finisher) {
 
-        try( DB b = new DB().open(() -> connection)){
-            return b.exec(process,finisher);
+        try (DB b = new DB().open(() -> connection)) {
+            return b.exec(process, finisher);
         }
 
     }
@@ -41,56 +44,52 @@ public class DB implements Makeable<DB>,Closeable {
     public DB open(String driverClass,
                    String connUrl,
                    String username,
-                   String password){
+                   String password) {
 
-        oper = new JdbcOperator(
-            newConnection(driverClass,connUrl,username,password));
+        tmpl = new JdbcTmpl(new JdbcOperator(
+            newConnection(driverClass, connUrl, username, password)));
         return this;
     }
 
-    public JdbcOperator oper(){
-        return oper;
+    public JdbcTmpl tmpl() {
+        return tmpl;
     }
 
 
-    public <T> T query(Function<ResultSet,JdbcOperator> queryFunc,
-                       Function<T,ResultSet> mapper) {
-        return mapper.apply(queryFunc.apply(oper));
+    public <T> T query(Function<ResultSet, JdbcTmpl> queryFunc,
+                       Function<T, ResultSet> mapper) {
+        return mapper.apply(queryFunc.apply(tmpl));
     }
 
-    public <T> void exec(Function<T,JdbcOperator> execFunc,
-                         Callback<T> cb){
-        cb.apply(execFunc.apply(oper));
+    public <T> void exec(Function<T, JdbcTmpl> execFunc,
+                         Callback<T> cb) {
+        cb.apply(execFunc.apply(tmpl));
     }
 
-    public <R,T> R exec(Function<T, JdbcOperator> process,
-                        Function<R, T> finisher) {
-        return finisher.apply(process.apply(oper));
+    public <R, T> R exec(Function<T, JdbcTmpl> process,
+                         Function<R, T> finisher) {
+        return finisher.apply(process.apply(tmpl));
     }
 
-    public DB open(Function._0<Connection> connectionSupplier){
-        oper = new JdbcOperator(connectionSupplier.apply());
+    public DB open(Function._0<Connection> connectionSupplier) {
+        tmpl = new JdbcTmpl(new JdbcOperator(connectionSupplier.apply()));
         return this;
     }
 
-    public DB open(ConnectionPool p){
-        try {
-            oper = new JdbcOperator(p.getConnection());
-        } catch (SQLException e) {
-            throw new UnexpectedException(e);
-        }
+    public DB open(ConnectionPool p) {
+        tmpl = new JdbcTmpl(new JdbcOperator(p.getConnection()));
         return this;
     }
 
     protected static Connection newConnection(String driverClass,
                                               String connUrl,
                                               String username,
-                                              String password){
+                                              String password) {
         try {
             DriverManager.registerDriver((java.sql.Driver)
                 Class.forName(driverClass).newInstance());
         } catch (ClassNotFoundException e) {
-            logger.debug("cont find class ["+driverClass+"]");
+            logger.debug("cont find class [" + driverClass + "]");
             e.printStackTrace();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -101,22 +100,25 @@ public class DB implements Makeable<DB>,Closeable {
         }
 
         try {
-            return DriverManager.getConnection(connUrl,username,password);
+            return DriverManager.getConnection(connUrl, username, password);
         } catch (SQLException e) {
-            logger.debug("cont open connection, sql error: "+e.toString());
+            logger.debug("cont open connection, sql error: " + e.toString());
             throw new UnexpectedException(e);
         }
     }
 
     @Override
-    public void close()
-    {
-        if(oper != null){
-            oper.close();
+    public void close() {
+        try {
+            if (tmpl != null) {
+                tmpl.close();
+            }
+        } catch (IOException e) {
+            _throw(e);
         }
     }
 
-    public static String tableName(Class<?> clazz){
-        return  S.str.underscore(clazz.getSimpleName());
+    public static String tableName(Class<?> clazz) {
+        return S.str.underscore(clazz.getSimpleName());
     }
 }

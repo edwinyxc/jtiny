@@ -26,6 +26,7 @@ public interface Renderable {
             } catch (IOException e) {
                 S._throw(e);
             }
+            resp.send(200);
         };
     }
 }

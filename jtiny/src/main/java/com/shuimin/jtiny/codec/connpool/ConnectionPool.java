@@ -9,6 +9,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.shuimin.base.S._throw;
+
 public class ConnectionPool {
 
 	private Logger logger = Logger.get();
@@ -105,27 +107,32 @@ public class ConnectionPool {
 		connPool.add(connection);
 	}
 
-	public synchronized Connection getConnection() throws SQLException {
-		ConnectionProxy connectionProxy = new ConnectionProxy(this);
-		int size = connPool.size();
-		if (connPool.size() == 0 || size > poolMaxSize) {
-			connectionProxy.setConnection(createConnection());
-			return connectionProxy.proxyBind();
-		}
-		Connection connection;
-		int i = 1;
-		for (connection = connPool.get(size - i); i <= size; i++) {
-			if (connection.isClosed()) {
-				connPool.remove(size - i);
-			} else {
-				break;
-			}
-		}
-		if (!connection.isClosed()) {
-			connectionProxy.setConnection(connection);
-		} else {
-			connectionProxy.setConnection(createConnection());
-		}
-		return connectionProxy.proxyBind();
+	public synchronized Connection getConnection() {
+        try {
+            ConnectionProxy connectionProxy = new ConnectionProxy(this);
+            int size = connPool.size();
+            if (connPool.size() == 0 || size > poolMaxSize) {
+                connectionProxy.setConnection(createConnection());
+                return connectionProxy.proxyBind();
+            }
+            Connection connection;
+            int i = 1;
+            for (connection = connPool.get(size - i); i <= size; i++) {
+                if (connection.isClosed()) {
+                    connPool.remove(size - i);
+                } else {
+                    break;
+                }
+            }
+            if (!connection.isClosed()) {
+                connectionProxy.setConnection(connection);
+            } else {
+                connectionProxy.setConnection(createConnection());
+            }
+            return connectionProxy.proxyBind();
+        }catch (SQLException e) {
+            _throw (e);
+        }
+        return null;
 	}
 }
