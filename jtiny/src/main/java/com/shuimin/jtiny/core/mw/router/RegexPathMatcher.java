@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.shuimin.jtiny.core.Server.G.debug;
+
 /**
  * Created by ed interrupt 2014/4/2.
  */
@@ -28,12 +30,14 @@ public class RegexPathMatcher implements  PathMather {
             matcher.appendReplacement(buffer, "([^/]+)");
         }
         matcher.appendTail(buffer);
+        debug("bind pattern: " + buffer);
         pattern = Pattern.compile(buffer.toString());
     }
 
     @Override
     public boolean match(Request req) {
         Matcher matcher = pattern.matcher(req.path());
+        debug("pattern: " + pattern.toString()+ "; path:" +req.path());
         if(matcher.matches()){
             for(int i = 0; i< matcher.groupCount();i++){
                 req.param(pathVarNames.get(i),matcher.group(i+1));

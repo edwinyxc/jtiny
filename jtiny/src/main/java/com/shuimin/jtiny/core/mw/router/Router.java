@@ -37,7 +37,6 @@ public interface Router {
 //            throw new HttpException(404, "request " + req.toString() + "not found");
         }
 
-        @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
         @Override
         public Router add(int methodMask, String path, Middleware... wares) {
             List<HttpMethod> methods = HttpMethod.unMask(methodMask);

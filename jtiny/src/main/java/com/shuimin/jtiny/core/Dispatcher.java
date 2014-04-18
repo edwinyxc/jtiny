@@ -10,10 +10,10 @@ import com.shuimin.jtiny.core.misc.Makeable;
 import com.shuimin.jtiny.core.mw.router.Router;
 
 import static com.shuimin.jtiny.core.Interrupt.kill;
+import static com.shuimin.jtiny.core.Server.G.debug;
 
 /**
  * @author ed
- * TODO://filter
  */
 public class Dispatcher
     implements Makeable<Dispatcher>,RequestHandler,Attrs<Dispatcher> {
@@ -63,8 +63,10 @@ public class Dispatcher
     @Override
     public void handle(Request req, Response resp) {
         ExecutionContext ctx = ExecutionContext.init(req, resp);
+        ExecutionManager.ExecutionContexts.set(ctx);
         try {
             Middleware processor = router.route(ctx);
+            debug("found middleware" + processor);
             if(processor == null) throw new HttpException(404,req.path());
             processor.exec(ctx);
         } catch (Interrupt.JumpInterruption jump) {
@@ -75,6 +77,8 @@ public class Dispatcher
         } catch (Interrupt.RenderInterruption render) {
             render.value().render(ctx.resp());
             kill();
+        } finally {
+            ExecutionManager.ExecutionContexts.remove();
         }
     }
 

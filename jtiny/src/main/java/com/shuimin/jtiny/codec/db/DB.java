@@ -28,7 +28,6 @@ public class DB implements Makeable<DB>,Closeable {
     public DB() {
     }
 
-
     public static <R, M> R fire(Connection connection,
                                          Function<M,JdbcOperator> process,
                                          Function<R, M> finisher) {
@@ -109,7 +108,6 @@ public class DB implements Makeable<DB>,Closeable {
         }
     }
 
-
     @Override
     public void close()
     {
@@ -117,7 +115,6 @@ public class DB implements Makeable<DB>,Closeable {
             oper.close();
         }
     }
-
 
     public static String tableName(Class<?> clazz){
         return  S.str.underscore(clazz.getSimpleName());

@@ -12,6 +12,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import static com.shuimin.base.S._throw;
+
 /**
  * <a DAO base Class>
  * encapsoluate some basic method to operate database connection
@@ -133,35 +135,45 @@ public class JdbcOperator implements Closeable{
         return pstmt.executeUpdate();
     }
 
-    public ResultSet executeQuery(String sql) throws SQLException {
+    public ResultSet executeQuery(String sql) {
         return executeQuery(sql, null);
     }
 
     /**
      * execute SQL statements to Query
      */
-    public ResultSet executeQuery(String sql, String[] params) throws SQLException {
-        if (pstmt != null) {
-            _closeStmt();
-        }
-        pstmt = conn.prepareStatement(sql);
-
-        if (params != null) {
-            for (int i = 0; i < params.length; i++) {
-                pstmt.setString(i + 1, params[i]);
+    public ResultSet executeQuery(String sql, String[] params) {
+        try {
+            if (pstmt != null) {
+                _closeStmt();
             }
-        }
+            pstmt = conn.prepareStatement(sql);
 
-        _debug(pstmt);
-        if (rs != null) {
-            _closeRs();
+            if (params != null) {
+                for (int i = 0; i < params.length; i++) {
+                    pstmt.setString(i + 1, params[i]);
+                }
+            }
+
+            _debug(pstmt);
+            if (rs != null) {
+                _closeRs();
+            }
+            rs = pstmt.executeQuery();
+            return rs;
+        } catch (SQLException s) {
+            _throw(s);
         }
-        rs = pstmt.executeQuery();
-        return rs;
+        return null;
     }
 
-    public int executeUpdate(String sql) throws SQLException {
-        return executeUpdate(sql, null);
+    public int executeUpdate(String sql) {
+        try {
+            return executeUpdate(sql, null);
+        }catch (SQLException e) {
+            _throw(e);
+        }
+        return -1;
     }
 
     //	/**
@@ -184,25 +196,33 @@ public class JdbcOperator implements Closeable{
 //		num = pstmt.executeUpdate();
 //		return num;
 //	}
-    public void transactionStart() throws SQLException {
-        synchronized (conn) {
-            conn.setAutoCommit(false);
+    public void transactionStart() {
+        try {
+            synchronized (conn) {
+                conn.setAutoCommit(false);
+            }
+        }catch (SQLException e) {
+            _throw(e);
         }
     }
 
-    public void transactionCommit() throws SQLException {
+    public void transactionCommit() {
         try {
-            synchronized (conn) {
-                conn.commit();
+            try {
+                synchronized (conn) {
+                    conn.commit();
+                }
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            } finally {
+                synchronized (conn) {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                }
             }
-        } catch (SQLException e) {
-            conn.rollback();
-            throw e;
-        } finally {
-            synchronized (conn) {
-                conn.setAutoCommit(true);
-                conn.close();
-            }
+        }catch (SQLException e) {
+            _throw(e);
         }
     }
 
@@ -211,8 +231,12 @@ public class JdbcOperator implements Closeable{
      * </p>
      * @throws SQLException
      */
-    public void rollback() throws SQLException {
-        conn.rollback();
+    public void rollback() {
+        try {
+            conn.rollback();
+        } catch (SQLException e) {
+            _throw(e);
+        }
     }
 
     private void _debug(Object o) {

@@ -77,4 +77,20 @@ public interface ExecutionContext {
         };
     }
 
+    public static ExecutionContext CUR() {
+        return ExecutionManager.ExecutionContexts.get();
+    }
+
+    public static Request REQ() {
+        return CUR().req();
+    }
+
+    public static Response RESP() {
+        return CUR().resp();
+    }
+
+}
+
+class ExecutionManager {
+    static ThreadLocal<ExecutionContext> ExecutionContexts = new ThreadLocal<>();
 }
