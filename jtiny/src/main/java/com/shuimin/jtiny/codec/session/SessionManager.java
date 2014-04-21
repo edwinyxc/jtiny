@@ -48,4 +48,8 @@ public class SessionManager implements Makeable<SessionManager>{
         return get(CUR().attr(SessionInstaller.JSESSIONID));
     }
 
+    public static SessionInstaller installer() {
+        return new SessionInstaller();
+    }
+
 }
