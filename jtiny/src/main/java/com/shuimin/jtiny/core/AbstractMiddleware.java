@@ -6,7 +6,7 @@ package com.shuimin.jtiny.core;
 public abstract class AbstractMiddleware implements Middleware {
 
     private Middleware next;
-    protected Middleware tail;
+    private Middleware tail;
 
     @Override
     public Middleware next() {

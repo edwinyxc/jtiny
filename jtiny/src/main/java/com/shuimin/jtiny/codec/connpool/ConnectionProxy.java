@@ -6,7 +6,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.sql.Connection;
 
-public class ConnectionProxy implements InvocationHandler
+class ConnectionProxy implements InvocationHandler
 {
 
 	private Connection connection;

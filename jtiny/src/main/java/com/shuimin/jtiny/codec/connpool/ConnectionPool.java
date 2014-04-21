@@ -17,8 +17,7 @@ public class ConnectionPool {
 	private List<Connection> connPool;
 	private int poolMaxSize = 10;
 
-	private int defaultInitSize = 5;
-	private String driverClass;
+    private String driverClass;
 	private String url;
 	private String username;
 	private String pass;
@@ -64,7 +63,8 @@ public class ConnectionPool {
 
 		connPool = new ArrayList<>();
 		int size;
-		if (poolMaxSize > defaultInitSize) {
+        int defaultInitSize = 5;
+        if (poolMaxSize > defaultInitSize) {
 			size = defaultInitSize;
 		} else {
 			size = poolMaxSize;

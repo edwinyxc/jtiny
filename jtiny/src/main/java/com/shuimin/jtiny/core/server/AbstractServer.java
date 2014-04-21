@@ -30,7 +30,7 @@ public abstract class AbstractServer implements Server {
                 try {
                     m.handle(ctx);
                 } catch (Interrupt.JumpInterruption jump) {
-                    continue;
+                    //continue;
                 } catch (Interrupt.KillInterruption kill) {
                     break;
                 } catch (Interrupt.RedirectInterruption redirection) {
@@ -42,6 +42,7 @@ public abstract class AbstractServer implements Server {
                 } catch (HttpException e) {
                     //not report until it be the last 404
                     if (e.code() == 404 && i != execChain.size() - 1) {
+                        //continue;
                     } else {
                         throw e;
                     }

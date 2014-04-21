@@ -32,20 +32,19 @@ public class HttpServerHandler
     protected void messageReceived(ChannelHandlerContext ctx,
                                    FullHttpRequest msg)
         throws Exception {
-        FullHttpRequest f_req = msg;
         FullHttpResponse f_resp
             = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK,
             Unpooled.buffer());
 
         try {
-            handler.handle(new NettyRequest(f_req, ctx.channel()),
+            handler.handle(new NettyRequest(msg, ctx.channel()),
                 new NettyResponse(f_resp,ctx));
 //            MiddlewareContext.debug("after dispatch");
 //            MiddlewareContext.debug(f_resp.getStatus());
 //            MiddlewareContext.debug(f_resp.headers());
 //            MiddlewareContext.debug(f_resp.content());
 
-            if (isKeepAlive(f_req)) {
+            if (isKeepAlive(msg)) {
                 //length
                 f_resp.headers().set(
                     CONTENT_LENGTH, f_resp.content().readableBytes());
@@ -53,7 +52,7 @@ public class HttpServerHandler
             }
             ChannelFuture last = ctx.write(f_resp);
             // Write the end marker
-            if (!isKeepAlive(f_req)) {
+            if (!isKeepAlive(msg)) {
                 // Close the connection when the whole content is written out.
                 last.addListener(ChannelFutureListener.CLOSE);
             }

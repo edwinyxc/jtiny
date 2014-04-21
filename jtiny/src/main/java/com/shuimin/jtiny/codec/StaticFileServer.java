@@ -143,11 +143,12 @@ public class StaticFileServer extends AbstractMiddleware implements RequestHandl
         String[] strings = req.headers().get("If-Modified-Since");
         if (strings != null && strings.length > 0) {
             SimpleDateFormat dateFormatter = new SimpleDateFormat(HTTP_DATE_FORMAT, Locale.US);
-            Date ifModifiedSinceDate = null;
+            Date ifModifiedSinceDate;
             try {
                 ifModifiedSinceDate = dateFormatter.parse(strings[0]);
             } catch (ParseException e) {
                 e.printStackTrace();
+                return;
             }
             long ifModifiedSinceDateSeconds = ifModifiedSinceDate.getTime() / 1000;
             long fileLastModifiedSeconds = file.lastModified() / 1000;

@@ -59,7 +59,7 @@ public class NettyResponse implements Response {
     @Override
     public void sendFile(File file) {
         RandomAccessFile raf ;
-        long fileLength = 0L;
+        long fileLength ;
         try {
             raf = new RandomAccessFile(file, "r");
         }catch (FileNotFoundException e){
