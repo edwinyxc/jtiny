@@ -44,7 +44,7 @@ public class SessionManager implements Makeable<SessionManager>{
      * <p>快捷获得session，如果没有使用 SessionInstaller则可能会出现意想不到的情况</p>
      * @return
      */
-    private static Session get() {
+    public static Session get() {
         return get(CUR().attr(SessionInstaller.JSESSIONID));
     }
 
