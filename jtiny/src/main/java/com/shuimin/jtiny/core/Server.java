@@ -72,6 +72,14 @@ public interface Server extends Makeable {
         }
     }
 
+    public static void config(String name, Object o) {
+        G.instance().put(name,o);
+    }
+
+    public static Object config(String name) {
+        return G.instance().get(name);
+    }
+
     public void listen(int port);
 
     public static G global(){

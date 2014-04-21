@@ -24,21 +24,29 @@ public class App {
                 render(text("hello"));
             }
         ));
-        app.get("/test", Action.fly(() -> {
+        app.get("/set",Action.fly(() -> {
+                SessionManager.get().set("username","hello");
+                render(text("hello"));
+            }
+        ));
+        app.get("/get", Action.fly(() -> {
                 render(text(_notNullElse((String) SessionManager.get().get("username"),
                     "not set")));
             }
         ));
         app.get("/session", Action.fly(() ->
             render(text("session id :" +CUR().attr(SessionInstaller.JSESSIONID)))));
-        app.get(".*", new StaticFileServer("C:\\var\\www"));
+
 
         Server.global().mode(Server.RunningMode.debug);
+
+        Server.config(SessionManager.CHECK_INTERVAL,30*3600);
+        Server.config(SessionManager.INVALID_INTERVAL,30*3600);
 
         debug("welcome");
 
         Server.basis(Server.BasicServer.jetty).use(SessionManager.installer())
-            .use(app).listen(8080);
+            .use(app).use(new StaticFileServer("C:\\var\\www")).listen(8080);
 
     }
 

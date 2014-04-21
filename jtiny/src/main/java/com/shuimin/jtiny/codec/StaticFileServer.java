@@ -3,6 +3,7 @@ package com.shuimin.jtiny.codec;
 import com.shuimin.base.S;
 import com.shuimin.base.f.Callback;
 import com.shuimin.base.f.Function;
+import com.shuimin.jtiny.codec.mime.MimeTypes;
 import com.shuimin.jtiny.core.AbstractMiddleware;
 import com.shuimin.jtiny.core.ExecutionContext;
 import com.shuimin.jtiny.core.RequestHandler;
@@ -12,7 +13,6 @@ import com.shuimin.jtiny.core.http.Request;
 import com.shuimin.jtiny.core.http.Response;
 import com.shuimin.jtiny.core.misc.Makeable;
 
-import javax.activation.MimetypesFileTypeMap;
 import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -37,6 +37,18 @@ public class StaticFileServer extends AbstractMiddleware implements RequestHandl
     private String[] defaultPages = {"index.html"};
     private Callback._2<Response, File> listDir = this::defaultListFiles;
 
+//    private MimetypesFileTypeMap mimetypesFileTypeMap = new MimetypesFileTypeMap();
+//
+//    {
+//        mimetypesFileTypeMap.addMimeTypes("text/css css CSS style");
+//        mimetypesFileTypeMap.addMimeTypes("application/javascript js jsx");
+//        mimetypesFileTypeMap.addMimeTypes("");
+//    }
+
+//    public StaticFileServer mimeTypes(Callback<MimetypesFileTypeMap> cb){
+//        cb.apply(mimetypesFileTypeMap);
+//        return this;
+//    }
 
     public StaticFileServer allowedNames(Function._0<Pattern> f) {
         this.allowedFileNames = f;
@@ -250,9 +262,11 @@ public class StaticFileServer extends AbstractMiddleware implements RequestHandl
         resp.header("Last-Modified", dateFormat.format(new Date(toCache.lastModified())));
     }
 
+
     private static void setContentType(Response resp, File file) {
-        MimetypesFileTypeMap mimetypesFileTypeMap = new MimetypesFileTypeMap();
-        resp.header("Content-Type", mimetypesFileTypeMap.getContentType(file));
+        String[] fullName = file.getName().split("\\.");
+        String ext = fullName[fullName.length-1];
+        resp.header("Content-Type", MimeTypes.getMimeType(ext));
     }
 
     @Override

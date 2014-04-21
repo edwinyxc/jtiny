@@ -18,7 +18,8 @@ import static com.shuimin.jtiny.core.Interrupt.redirect;
  */
 public class SessionInstaller extends AbstractMiddleware{
 
-    public static final String JSESSIONID = "JESSIONID";
+    public static final String JSESSIONID = "JSESSIONID";
+
 
     String checkJSession(Request req) {
         Cookie c = req.cookie(JSESSIONID);
@@ -41,7 +42,8 @@ public class SessionInstaller extends AbstractMiddleware{
             uuid = writeSessionId(ctx.resp());
             redirect(ctx.req().path());
         }
-        CUR().attr(JSESSIONID,uuid);
+        CUR().attr(JSESSIONID, uuid);
         return ctx;
     }
+
 }
