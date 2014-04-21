@@ -6,6 +6,8 @@ import com.shuimin.jtiny.core.misc.Makeable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import static com.shuimin.jtiny.core.ExecutionContext.CUR;
+
 /**
  * Created by ed on 2014/4/18.
  */
@@ -35,5 +37,15 @@ public class SessionManager implements Makeable<SessionManager>{
     }
 
     private static Function._0<Session> supplierFunc = () -> new DefaultSession();
+
+//    public static
+
+    /**
+     * <p>快捷获得session，如果没有使用 SessionInstaller则可能会出现意想不到的情况</p>
+     * @return
+     */
+    private static Session get() {
+        return get(CUR().attr(SessionInstaller.JSESSIONID));
+    }
 
 }

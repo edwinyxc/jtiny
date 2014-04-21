@@ -13,10 +13,10 @@ import static com.shuimin.jtiny.core.Server.BasicServer.jetty;
 public class CoreTest {
 
     public static void simple() {
-        Server.basis(jetty).use((req, resp) -> {
+        Server.basis(jetty).use(Action.simple((req, resp) -> {
             S.echo(req);
             resp.writer().print("sddd");
-        }).listen(9090);
+        })).listen(9090);
     }
 
 

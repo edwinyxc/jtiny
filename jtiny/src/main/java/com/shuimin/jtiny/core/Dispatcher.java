@@ -2,21 +2,18 @@ package com.shuimin.jtiny.core;
 
 import com.shuimin.jtiny.core.exception.HttpException;
 import com.shuimin.jtiny.core.http.HttpMethod;
-import com.shuimin.jtiny.core.http.Request;
-import com.shuimin.jtiny.core.http.Response;
 import com.shuimin.jtiny.core.misc.Attrs;
 import com.shuimin.jtiny.core.misc.Config;
 import com.shuimin.jtiny.core.misc.Makeable;
 import com.shuimin.jtiny.core.mw.router.Router;
 
-import static com.shuimin.jtiny.core.Interrupt.kill;
 import static com.shuimin.jtiny.core.Server.G.debug;
 
 /**
  * @author ed
  */
-public class Dispatcher
-    implements Makeable<Dispatcher>,RequestHandler,Attrs<Dispatcher> {
+public class Dispatcher extends AbstractMiddleware
+    implements Makeable<Dispatcher>, Attrs<Dispatcher> {
 
     final private Router router;
 
@@ -61,26 +58,10 @@ public class Dispatcher
 
 
     @Override
-    public void handle(Request req, Response resp) {
-        ExecutionContext ctx = ExecutionContext.init(req, resp);
-        ExecutionManager.ExecutionContexts.set(ctx);
-        try {
-            Middleware processor = router.route(ctx);
-            debug("found middleware" + processor);
-            if(processor == null) throw new HttpException(404,req.path());
-            processor.exec(ctx);
-        } catch (Interrupt.JumpInterruption jump) {
-            //fire a signal
-        } catch (Interrupt.RedirectInterruption redirection) {
-            ctx.resp().redirect(redirection.uri());
-            kill();
-        } catch (Interrupt.RenderInterruption render) {
-            render.value().render(ctx.resp());
-            kill();
-        } finally {
-            ExecutionManager.ExecutionContexts.remove();
-        }
+    public ExecutionContext handle(ExecutionContext ctx) {
+        Middleware processor = router.route(ctx);
+        debug("found middleware" + processor);
+        if (processor == null) throw new HttpException(404, ctx.req().path());
+        return processor.exec(ctx);
     }
-
-
 }

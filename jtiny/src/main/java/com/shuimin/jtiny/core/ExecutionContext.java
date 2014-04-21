@@ -1,19 +1,15 @@
 package com.shuimin.jtiny.core;
 
-import com.shuimin.jtiny.core.http.Response;
 import com.shuimin.jtiny.core.http.Request;
-
-import java.util.HashMap;
-import java.util.Map;
+import com.shuimin.jtiny.core.http.Response;
+import com.shuimin.jtiny.core.misc.Attrs;
 
 /**
  * @author ed
  */
-public interface ExecutionContext {
+public interface ExecutionContext extends Attrs<ExecutionContext> {
 
     public Request req();
-
-    public Map<String, Object> attrs();
 
     public Response resp();
 
@@ -32,11 +28,6 @@ public interface ExecutionContext {
             @Override
             public Request req() {
                 return req;
-            }
-
-            @Override
-            public Map<String, Object> attrs() {
-                return new HashMap<>();
             }
 
             @Override
@@ -70,10 +61,6 @@ public interface ExecutionContext {
                 return value;
             }
 
-            @Override
-            public Map<String, Object> attrs() {
-                return _this.attrs();
-            }
         };
     }
 
@@ -91,6 +78,3 @@ public interface ExecutionContext {
 
 }
 
-class ExecutionManager {
-    static ThreadLocal<ExecutionContext> ExecutionContexts = new ThreadLocal<>();
-}

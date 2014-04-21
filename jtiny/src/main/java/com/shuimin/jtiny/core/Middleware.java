@@ -1,5 +1,7 @@
 package com.shuimin.jtiny.core;
 
+import java.util.List;
+
 /**
  * <p>
  * Middleware </p>
@@ -33,19 +35,19 @@ public interface Middleware {
      * @param wares
      * @return
      */
-    public static Middleware string(Middleware... wares) {
-        if (wares.length == 0) {
+    public static Middleware string(List<Middleware> wares) {
+        if (wares.size() == 0) {
             return null;
         }
-        Middleware recent = wares[0];
-        for (int i = 1; i < wares.length; i++) {
-            Middleware now = wares[i];
+        Middleware recent = wares.get(0);
+        for (int i = 1; i < wares.size(); i++) {
+            Middleware now = wares.get(i);
             if (recent != null) {
                 recent.next(now);
             }
             recent = now;
         }
-        return wares[0];
+        return wares.get(0);
     }
 
 }

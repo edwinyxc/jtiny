@@ -80,7 +80,7 @@ public interface Server extends Makeable {
 
     public void stop();
 
-    public Server use(RequestHandler handler);
+    public Server use(Middleware handler);
 
     public static Server basis(BasicServer server) {
         switch (server) {
